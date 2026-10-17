@@ -1,0 +1,22 @@
+{
+  "name": "majestic",
+  "version": "1.0.0",
+  "description": "Server-authoritative item system (interview task)",
+  "main": "dist/entry.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/entry.js",
+    "test": "tsx src/test/runner.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^24.0.0",
+    "tsx": "^4.19.0",
+    "@types/ws": "^8.0.0"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
