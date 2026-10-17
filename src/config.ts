@@ -3,7 +3,7 @@ export const config = {
   TICK_INTERVAL_MS: 100,
   WORLD_WIDTH: 800,
   WORLD_HEIGHT: 600,
-  
+
   STORAGE_DELAY_MS: 50,
   HTTP_PORT: 3000,
   WS_PORT: 3001,
