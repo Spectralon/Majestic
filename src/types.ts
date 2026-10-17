@@ -1,43 +1,39 @@
 export interface Vec2 {
-  x: number;
-  y: number;
-}
-
-export interface PlayerStats {
-  hp: number;
-  armor: number;
+  readonly x: number;
+  readonly y: number;
 }
 
 export interface ActiveEffect {
-  type: string;
+  readonly type: string;
   remainingTicks: number;
   data?: Record<string, number>;
 }
 
-export interface Player {
-  id: string;
-  position: Vec2;
-  target: Vec2 | null;
-  stats: PlayerStats;
-  effects: ActiveEffect[];
+export interface PlayerData {
+  readonly id: string;
+  readonly position: Vec2;
+  readonly target: Vec2 | null;
+  readonly hp: number;
+  readonly armor: number;
+  readonly effects: ActiveEffect[];
 }
 
 export interface ItemInstance {
-  id: string;
-  type: string;
-  amount: number;
+  readonly id: string;
+  readonly type: string;
+  readonly amount: number;
 }
 
 export interface GroundItem {
-  id: string;
-  type: string;
-  position: Vec2;
-  expiresAtTick: number;
+  readonly id: string;
+  readonly type: string;
+  readonly position: Vec2;
+  readonly expiresAtTick: number;
 }
 
 export interface WorldSnapshot {
-  tick: number;
-  players: Player[];
-  groundItems: GroundItem[];
-  inventories: Record<string, ItemInstance[]>;
+  readonly tick: number;
+  readonly players: PlayerData[];
+  readonly groundItems: GroundItem[];
+  readonly inventories: Record<string, ItemInstance[]>;
 }

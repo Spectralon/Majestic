@@ -1,4 +1,4 @@
-import type { Player } from "../types.js";
+import type { Player } from "../core/player.js";
 import type { WorldState } from "../core/world.js";
 
 export interface IItem {
