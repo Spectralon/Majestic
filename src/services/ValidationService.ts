@@ -3,7 +3,7 @@ import type { GameLoopService } from "./GameLoopService.js";
 export type ValidationResult = { ok: true } | { ok: false; reason: string };
 
 export class ValidationService {
-  constructor(private gameLoop: GameLoopService) {}
+  constructor(private _gameLoop: GameLoopService) {}
 
   validateMove(playerId: string, x: number, y: number): ValidationResult {
     throw new Error("Not implemented");

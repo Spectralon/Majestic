@@ -5,7 +5,7 @@ export class MemoryStorage implements IStorage {
   private _inventories = new Map<string, ItemInstance[]>();
   private _groundItems = new Map<string, GroundItem>();
 
-  constructor(private delayMs: number) {}
+  constructor(private _delayMs: number) {}
 
   async saveInventory(playerId: string, items: ItemInstance[]): Promise<void> {
     await this.delay();
@@ -33,6 +33,6 @@ export class MemoryStorage implements IStorage {
   }
 
   private delay(): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, this.delayMs));
+    return new Promise((resolve) => setTimeout(resolve, this._delayMs));
   }
 }

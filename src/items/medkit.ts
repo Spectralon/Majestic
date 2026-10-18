@@ -5,9 +5,9 @@ export class Medkit implements IItem {
   readonly type = "medkit";
   readonly stackable = true;
 
-  constructor(private addHP: number) {}
+  constructor(private _addHP: number) {}
 
   onUse(player: Player): void {
-    player.addHP(this.addHP);
+    player.addHP(this._addHP);
   }
 }

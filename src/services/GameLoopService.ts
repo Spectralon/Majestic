@@ -8,14 +8,14 @@ export class GameLoopService {
   private _world: WorldState | undefined = undefined;
 
   constructor(
-    private gameFactory: GameFactory,
-    private effectService: EffectService,
-    private storage: IStorage,
-    private broadcast: (snapshot: WorldSnapshot) => void,
+    private _gameFactory: GameFactory,
+    private _effectService: EffectService,
+    private _storage: IStorage,
+    private _broadcast: (snapshot: WorldSnapshot) => void,
   ) {}
 
   initialize(): void {
-    this._world = this.gameFactory.createGameWorld();
+    this._world = this._gameFactory.createGameWorld();
   }
 
   get world(): WorldState {
