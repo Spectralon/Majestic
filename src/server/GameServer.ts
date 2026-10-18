@@ -5,9 +5,9 @@ import type { WorldSnapshot } from "../types.js";
 
 export class GameServer {
   constructor(
-    private world: WorldState,
     private validationService: ValidationService,
     private inventoryService: InventoryService,
+    private world: WorldState,
   ) {}
 
   async start(): Promise<void> {

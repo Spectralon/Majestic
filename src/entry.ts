@@ -1,24 +1,27 @@
-import { config } from "./config.js";
-import { WorldState } from "./core/world.js";
 import { MemoryStorage } from "./storage/MemoryStorage.js";
+import { StaticDataService } from "./services/StaticDataService.js";
+import { ItemRegistryService } from "./services/ItemRegistryService.js";
+import { GameFactory } from "./services/GameFactory.js";
 import { EffectService } from "./services/EffectService.js";
 import { InventoryService } from "./services/InventoryService.js";
 import { ValidationService } from "./services/ValidationService.js";
 import { TickService } from "./services/TickService.js";
 import { GameServer } from "./server/GameServer.js";
-import "./items/index.js";
 
 async function main(): Promise<void> {
   console.log("[entry] Server starting...");
 
-  const storage = new MemoryStorage();
-
-  const world = new WorldState();
+  const staticDataService = new StaticDataService();
+  const storage = new MemoryStorage(staticDataService.config.STORAGE_DELAY_MS);
+  const itemRegistry = new ItemRegistryService();
+  const gameFactory = new GameFactory(staticDataService, itemRegistry);
+  const world = gameFactory.createGameWorld();
+  gameFactory.createAllItems();
 
   const effectService = new EffectService(world);
   const inventoryService = new InventoryService(world, storage);
   const validationService = new ValidationService(world);
-  const server = new GameServer(world, validationService, inventoryService);
+  const server = new GameServer(validationService, inventoryService, world);
   const tickService = new TickService(world, effectService, storage, (snapshot) =>
     server.broadcast(snapshot),
   );
@@ -27,7 +30,7 @@ async function main(): Promise<void> {
   tickService.start();
 
   console.log(
-    `[entry] running: HTTP ${config.HTTP_PORT}, WS ${config.WS_PORT}, tick ${config.TICK_INTERVAL_MS}ms`,
+    `[entry] running: HTTP ${staticDataService.config.HTTP_PORT}, WS ${staticDataService.config.WS_PORT}, tick ${staticDataService.config.TICK_INTERVAL_MS}ms`,
   );
 }
 

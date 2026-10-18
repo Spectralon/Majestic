@@ -1,10 +1,11 @@
 import type { IStorage } from "./IStorage.js";
 import type { ItemInstance, GroundItem } from "../types.js";
-import { config } from "../config.js";
 
 export class MemoryStorage implements IStorage {
   private inventories = new Map<string, ItemInstance[]>();
   private groundItems = new Map<string, GroundItem>();
+
+  constructor(private delayMs: number) {}
 
   async saveInventory(playerId: string, items: ItemInstance[]): Promise<void> {
     await this.delay();
@@ -32,6 +33,6 @@ export class MemoryStorage implements IStorage {
   }
 
   private delay(): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, config.STORAGE_DELAY_MS));
+    return new Promise((resolve) => setTimeout(resolve, this.delayMs));
   }
 }

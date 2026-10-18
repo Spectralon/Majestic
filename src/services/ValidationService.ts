@@ -6,18 +6,18 @@ export class ValidationService {
   constructor(private world: WorldState) {}
 
   validateMove(playerId: string, x: number, y: number): ValidationResult {
-    throw new Error("Not implemented: Stage 14");
+    throw new Error("Not implemented");
   }
 
   validatePickup(playerId: string, groundItemId: string): ValidationResult {
-    throw new Error("Not implemented: Stage 14");
+    throw new Error("Not implemented");
   }
 
   validateUse(playerId: string, instanceId: string): ValidationResult {
-    throw new Error("Not implemented: Stage 14");
+    throw new Error("Not implemented");
   }
 
   validateDrop(playerId: string, instanceId: string): ValidationResult {
-    throw new Error("Not implemented: Stage 14");
+    throw new Error("Not implemented");
   }
 }

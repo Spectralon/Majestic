@@ -1,23 +1,26 @@
 import { Player } from "./player.js";
-import type { GroundItem, ItemInstance, Vec2, WorldSnapshot } from "../types.js";
-import { config } from "../config.js";
+import type { GroundItem, ItemInstance, WorldSnapshot } from "../types.js";
+import { validatePosition } from "../utils/validation.js";
 
 export class WorldState {
+  private readonly _config: any;
   private _tick: number = 0;
   private _players: Map<string, Player> = new Map();
   private _groundItems: Map<string, GroundItem> = new Map();
   private _inventories: Map<string, ItemInstance[]> = new Map();
 
+  constructor(config: any) {
+    this._config = config;
+  }
+
   get tick(): number {
     return this._tick;
   }
 
-  addPlayer(id: string, position: Vec2): Player {
-    if (!id) throw new Error("Player id must be non-empty");
-    const player = new Player(id, position);
+  addPlayer(player: Player): void {
+    if (this._players.has(player.id)) throw new Error(`Player already exists: ${player.id}`);
     this._players.set(player.id, player);
     this._inventories.set(player.id, []);
-    return player;
   }
 
   removePlayer(playerId: string): void {
@@ -37,7 +40,7 @@ export class WorldState {
   addGroundItem(item: GroundItem): void {
     if (!item.id) throw new Error("Ground item id must be non-empty");
     if (!item.type) throw new Error("Ground item type must be non-empty");
-    this.assertWithinBounds(item.position, "ground item");
+    validatePosition(item.position, this._config.WORLD_WIDTH, this._config.WORLD_HEIGHT, "ground item position");
     this._groundItems.set(item.id, item);
   }
 
@@ -70,11 +73,5 @@ export class WorldState {
       groundItems: this.getGroundItems(),
       inventories: Object.fromEntries(this._inventories.entries()),
     };
-  }
-
-  private assertWithinBounds(pos: Vec2, label: string): void {
-    if (pos.x < 0 || pos.x > config.WORLD_WIDTH || pos.y < 0 || pos.y > config.WORLD_HEIGHT) {
-      throw new Error(`${label} position out of bounds: (${pos.x}, ${pos.y})`);
-    }
   }
 }
