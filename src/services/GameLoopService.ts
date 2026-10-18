@@ -1,21 +1,20 @@
 import type { WorldState } from "../core/world.js";
 import type { IStorage } from "../storage/IStorage.js";
 import type { EffectService } from "./EffectService.js";
-import type { GameFactory } from "./GameFactory.js";
-import type { WorldSnapshot } from "../types.js";
+import type { ITickable, WorldSnapshot } from "../types.js";
 
 export class GameLoopService {
   private _world: WorldState | undefined = undefined;
+  private _tickables: ITickable[] = [];
 
   constructor(
-    private _gameFactory: GameFactory,
     private _effectService: EffectService,
     private _storage: IStorage,
     private _broadcast: (snapshot: WorldSnapshot) => void,
   ) {}
 
-  initialize(): void {
-    this._world = this._gameFactory.createGameWorld();
+  initialize(world: WorldState): void {
+    this._world = world;
   }
 
   get world(): WorldState {
@@ -25,6 +24,10 @@ export class GameLoopService {
     return this._world;
   }
 
+  register(tickable: ITickable): void {
+    this._tickables.push(tickable);
+  }
+
   start(): void {
   }
 
@@ -32,5 +35,11 @@ export class GameLoopService {
   }
 
   tick(): void {
+    this._tickables.forEach((tickable) => {
+      if (tickable !== null) {
+        tickable.tick();
+      }
+    });
+    this._tickables = this._tickables.filter((tickable) => tickable !== null);
   }
 }

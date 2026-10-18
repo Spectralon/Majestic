@@ -1,21 +1,21 @@
-import type { ActiveEffect, PlayerData, Vec2 } from "../types.js";
+import type { IEffect, ITickable, PlayerData, Vec2 } from "../types.js";
 import { validatePosition, validateAmount, validateStat } from "../utils/validation.js";
 
-export class Player {
+export class Player implements ITickable {
   readonly id: string;
-  
+
   private readonly _config: any;
   private _position: Vec2;
   private _target: Vec2 | null = null;
   private _hp: number;
   private _armor: number;
-  private _effects: ActiveEffect[] = [];
+  private _effects: IEffect[] = [];
 
   constructor(id: string, position: Vec2, config: any) {
     if (!id) throw new Error("Player id must be non-empty");
     this.id = id;
     this._config = config;
-    this._position = validatePosition(position, config.WORLD_WIDTH, config.WORLD_HEIGHT, "position");
+    this._position = validatePosition(position, config.WORLD_WIDTH, config.WORLD_HEIGHT, "Player position");
     this._hp = validateStat(config.PLAYER.spawnHP, "spawnHP");
     this._armor = validateStat(config.PLAYER.spawnArmor, "spawnArmor");
   }
@@ -36,8 +36,8 @@ export class Player {
     return this._armor;
   }
 
-  get effects(): readonly ActiveEffect[] {
-    return this._effects.map((effect) => ({ ...effect }));
+  get effects(): readonly IEffect[] {
+    return this._effects;
   }
 
   addHP(amount: number): void {
@@ -65,34 +65,30 @@ export class Player {
     };
   }
 
-  addEffect(type: string, remainingTicks: number, data?: Record<string, number>): void {
-    if (!type) throw new Error("addEffect: type must be non-empty");
-    if (this._effects.some((effect) => effect.type === type)) {
-      throw new Error(`addEffect: effect already active: ${type}`);
+  addEffect(effect: IEffect): void {
+    if (!effect) throw new Error("addEffect: effect must be provided");
+    const index = this._effects.findIndex((candidate) => candidate.type === effect.type);
+    if (index === -1) {
+      this._effects.push(effect);
+    } else {
+      this._effects[index] = effect;
     }
-    if (!Number.isInteger(remainingTicks) || remainingTicks <= 0) {
-      throw new Error("addEffect: remainingTicks must be a positive integer");
-    }
-    const effect: ActiveEffect = { type, remainingTicks };
-    if (data !== undefined) {
-      effect.data = { ...data };
-    }
-    this._effects.push(effect);
   }
 
-  getEffect(type: string): ActiveEffect | undefined {
-    const effect = this._effects.find((candidate) => candidate.type === type);
-    return effect === undefined ? undefined : { ...effect };
+  getEffect(type: string): IEffect | undefined {
+    return this._effects.find((candidate) => candidate.type === type);
   }
 
   removeEffect(type: string): void {
     this._effects = this._effects.filter((effect) => effect.type !== type);
   }
 
-  advanceEffects(): void {
-    this._effects = this._effects
-      .map((effect) => ({ ...effect, remainingTicks: effect.remainingTicks - 1 }))
-      .filter((effect) => effect.remainingTicks > 0);
+  private advanceEffects(): void {
+    this._effects = this._effects.filter((effect) => effect !== null && effect.remainingTicks >= 0);
+  }
+
+  tick(): void {
+    this.advanceEffects();
   }
 
   toData(): PlayerData {
@@ -102,7 +98,7 @@ export class Player {
       target: this._target === null ? null : { ...this._target },
       hp: this._hp,
       armor: this._armor,
-      effects: this._effects.map((effect) => ({ ...effect })),
+      effects: this._effects.map((effect) => effect.clone()),
     };
   }
 }
