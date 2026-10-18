@@ -1,13 +1,13 @@
-# AGENTS.md — Agent Rules (Interview)
+# AGENTS.md — Agent Rules (Majestic)
 
-Universal rules for AI agents working on the Next.js interview-prep app: develop, test (including runtime) and debug via MCP.
+Universal rules for AI agents working on **Majestic**: a server-authoritative item system in Node.js + TypeScript (interview task). Development, build, typecheck and tests (including runtime) are performed by the coordinator; verification is done against artifacts.
 
 ## This project — documentation map
 
 | File | Role |
 | ---- | ---- |
-| `task.md` | ТЗ: задание, условия, структура приложения, приёмка, запреты |
-| `report.md` | Knowledge base: tooling facts, dev-cycle status, pitfalls & dead ends — **read first** |
+| `task.md` | Spec: the task, conditions, application structure, acceptance criteria, prohibitions |
+| `report.md` | Knowledge base: code facts, architecture, pitfalls & dead ends — **read first** |
 
 ## Documentation discipline
 
@@ -22,54 +22,52 @@ Universal rules for AI agents working on the Next.js interview-prep app: develop
 Always use CONTINUABLE subagents (run_in_background: true). NEVER EVER USE ONE-SHOT SUBAGENTS. All subagents should be run sequentially — no parallel jobs.
 
 - One task per subagent, with a self-contained spec (exact paths, commands, expected outputs).
-- The coordinator does not implement — read-only grounding only. Subagents (workspace-write sandbox, approvals disabled) cannot launch executables or escalate — all exe/runtime work is done by the coordinator.
+- The coordinator does not implement — read-only grounding only. Subagents (workspace-write sandbox) cannot launch executables or escalate — all exe/runtime work (`tsc`, `tsx`, `node`) is done by the coordinator.
 
 ## Engineering principles
 
-- Verify results at the artifact level — exit codes, build output, rendered DOM, HTTP status — not just "it ran".
+- Verify results at the artifact level — exit code, typecheck/test output (PASS/FAIL), HTTP status — not just "it ran".
 - Keep ONE canonical source of truth for tooling facts (`report.md`).
-- Record pitfalls and dead ends as final facts in the knowledge base, never as history.
+- Record pitfalls and dead ends as final facts in the knowledge base (`report.md`), never as history.
 - Document every dead end in one line so it is never retried.
 
-## MCP tooling (playwright, context7)
+## Code rules (fixed by the user)
 
-- `playwright` — runtime-тесты и дебаг: `navigate` → `snapshot` (accessibility-дерево, `browser_snapshot`) → `console_messages` → `network_requests` → `evaluate`. `snapshot` — **основной** инструмент: по его refs выполняются все действия (click/type/hover). `take_screenshot` (`browser_take_screenshot`) — **только финальная визуальная верификация** (по скриншоту действия выполнять нельзя). Требует запущенный dev-сервер на `http://localhost:3000`.
-- `context7` — актуальная документация библиотек: Next.js → `/vercel/next.js`. Использовать для API Next 16 и breaking changes (см. блок nextjs-agent-rules ниже).
-- HMR-WebSocket-ошибки в playwright-браузере (`ERR_INVALID_HTTP_RESPONSE` на `/_next/hmr`) — артефакт окружения, НЕ баг приложения: фильтровать при проверке console (доказательство — `report.md`, Pitfalls).
-- Артефакты playwright лежат в `%LOCALAPPDATA%\Temp\playwright-mcp-output` — не в workspace, не чистить корень проекта.
+- Code is written clean, **without comments or TODO markers** (they never land in commits — the user strips them).
+- Method stub with a return type: `throw new Error("Not implemented")` — that is code, not a comment; it does land in commits.
+- Commits are made by the user; the coordinator only prepares files and verifies. The workspace is **not** a git repository.
+- **Constructors:** a ctor only receives and stores references to the services it needs (DI). Creating objects inside a constructor is forbidden. Creation/initialization — in separate methods (`initialize()` pattern). The factory is stateless: it does not hold `WorldState`, and there are no "already created" checks.
+- **Owner of `WorldState`** — `GameLoopService`: creates the world in `initialize()` via the factory; exposed outward only through the readonly getter `world`. Services do not receive `WorldState` in constructors — they either hold a reference to `GameLoopService` or receive the world as a method argument (`EffectService.tick(world)`).
+- **Validator naming:** `validate<Thing>` (the method THROWS on error and returns the value). Names of the form `valid<Thing>` are forbidden — they look like a boolean check.
+- **Encapsulation:** the owner of a state validates its own fields; items/services NEVER clamp or validate numbers — they only call the owner's methods (Medkit: `player.addHP(this.addHP)`).
+- Private variable names start with an underscore `_`.
 
 ## Environment (this machine)
 
-- Windows PowerShell 5.1 only (`powershell.exe`; `pwsh` is NOT installed). Сложные строки — temp `.ps1` + `powershell.exe -NoProfile -ExecutionPolicy Bypass -File <ps1>`; call-operator `& "$env:..."` отклоняется парсером dsh-allow — не использовать.
-- Node v24.13.1: `C:\Program Files\nodejs\node.exe` (npm 11.10.0). System HTTPS (schannel) is broken (`SEC_E_NO_CREDENTIALS`) — use Node for network. Node ≥ 19 cannot spawn `.cmd` without a shell — call `node.exe` directly. Inline `node -e` with quotes is mangled — use temp `.mjs` files and delete them after.
-- git 2.46.0.windows.1 · pnpm 12.4.1 · gh 2.102.0 (portable: `C:\Users\USER\AppData\Roaming\npm\gh.exe`, НЕ авторизован) · vercel 63.0.1 (npm global).
-- Sandbox (workspace-write) режет spawn дочерних процессов из node (`spawn EPERM`): `npm install`, `next build`, `next dev` — запускать только под `danger-full-access`. Прямой `node.exe` из PowerShell в confined-режиме работает.
-- npm-операции: задавать `npm_config_cache=E:\dev\Web\Interview\.tmp\npm-cache` (дефолтный кэш не пишется).
+- Windows PowerShell 5.1 only (`powershell.exe`; `pwsh` is NOT installed). Complex strings — a temp `.ps1` + `powershell.exe -NoProfile -ExecutionPolicy Bypass -File <ps1>`; the call operator `& "$env:..."` is rejected by the dsh-allow parser — do not use it.
+- Node v24: `C:\Program Files\nodejs\node.exe`. System HTTPS (schannel) is broken (`SEC_E_NO_CREDENTIALS`) — use Node for network. Node ≥ 19 cannot spawn `.cmd` without a shell — call `node.exe` directly. Inline `node -e` with quotes is mangled — use temp `.mjs` files and delete them after.
+- Sandbox (workspace-write) cuts off child-process spawns from node (`spawn EPERM`): `tsc` / `tsx` / `node` (build/test) — run only under `danger-full-access`. In this workspace `pwsh` itself hits a sandbox-ACL error (`SetNamedSecurityInfoW Win32 5`) — read files via `read`/`glob`, not via the shell.
 
 ## Ground truth (this project)
 
-- Версии: `next 16.4.0`, `react`/`react-dom 19.3.0`, `typescript 5.9.3` (`strict: true`), `tailwindcss 4.3.3`, `eslint 9.39.5`. Сборка — Turbopack по умолчанию.
-- Scripts: `dev` / `build` / `start` / `lint`. `next dev` — фоновой job'ом, затем runtime-проверки через playwright, затем kill.
-- Workspace — git-репозиторий, но коммитить и пушить тебе НЕЛЬЗЯ - спрашивай разрешение пользователя.
+- Stack: Node.js + TypeScript (`strict: true`), `ws` for the WS server. tsconfig: `target ES2022`, `module`/`moduleResolution NodeNext`, `rootDir src`, `outDir dist`.
+- Versions (installed): `typescript 5.9.3`, `tsx 4.23.15`, `ws 8.22.0`, `@types/node 24.19.2` (declared in package.json: `^5.9.3` / `^4.19.0` / `^8.18.0` / `^24.0.0`).
+- Scripts: `build` (tsc) / `start` (node dist/entry.js) / `test` (tsx src/test/runner.ts) / `typecheck` (tsc --noEmit).
+- Commands (run by the coordinator, under `danger-full-access`):
+  - typecheck: `node.exe node_modules\typescript\bin\tsc --noEmit --project tsconfig.json`
+  - test: `node.exe node_modules\tsx\dist\cli.mjs src\test\runner.ts`
+  - build: `node.exe node_modules\typescript\bin\tsc`
+- Server: HTTP + WS (ports from `StaticDataService.config`). Runtime check — the scenario in `src/test/runner.ts` (smoke: drop→pickup, expiry by timeout, `use` effect, concurrent pickup).
 
 ## Root allowlist (workspace)
 
 Project root must contain ONLY:
 
 - `AGENTS.md`, `report.md`, `task.md`
-- `app/`, `components/`, `lib/`, `public/` — код приложения
-- `node_modules/`, `.git/`, `README.md`, `package.json`, `package-lock.json`, `tsconfig.json`, `next.config.ts`, `eslint.config.mjs`, `next-env.d.ts`, `.gitignore`
-- `.next/` — артефакт сборки (gitignored, регенерируется `next build`)
-- `.tmp/` — temp-скрипты и npm-кэш: удалять после использования
+- `src/` — application code (`entry.ts`, `types.ts`, `core/`, `services/`, `storage/`, `items/`, `server/`, `utils/`, `test/`)
+- `node_modules/`, `package.json`, `package-lock.json`, `tsconfig.json`, `.gitignore`
+- `dist/` — build artifact (regenerated by `npm run build`)
+- `.idea/` — IDE (JetBrains)
+- `README.md` — required by the spec (how to run + architecture overview)
 
 Temp scripts (tmp-*.mjs, tmp-*.ps1 etc.) must be deleted after use.
-
-<!-- BEGIN:nextjs-agent-rules -->
-
-## This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->
