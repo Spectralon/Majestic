@@ -5,7 +5,7 @@ import { GameFactory } from "./services/GameFactory.js";
 import { EffectService } from "./services/EffectService.js";
 import { InventoryService } from "./services/InventoryService.js";
 import { ValidationService } from "./services/ValidationService.js";
-import { TickService } from "./services/TickService.js";
+import { GameLoopService } from "./services/GameLoopService.js";
 import { GameServer } from "./server/GameServer.js";
 
 async function main(): Promise<void> {
@@ -15,19 +15,19 @@ async function main(): Promise<void> {
   const storage = new MemoryStorage(staticDataService.config.STORAGE_DELAY_MS);
   const itemRegistry = new ItemRegistryService();
   const gameFactory = new GameFactory(staticDataService, itemRegistry);
-  const world = gameFactory.createGameWorld();
   gameFactory.createAllItems();
 
-  const effectService = new EffectService(world);
-  const inventoryService = new InventoryService(world, storage);
-  const validationService = new ValidationService(world);
-  const server = new GameServer(validationService, inventoryService, world);
-  const tickService = new TickService(world, effectService, storage, (snapshot) =>
+  const effectService = new EffectService();
+  const gameLoop = new GameLoopService(gameFactory, effectService, storage, (snapshot) =>
     server.broadcast(snapshot),
   );
+  gameLoop.initialize();
+  const validationService = new ValidationService(gameLoop);
+  const inventoryService = new InventoryService(gameLoop, storage);
+  const server = new GameServer(gameFactory, validationService, inventoryService, gameLoop);
 
   await server.start();
-  tickService.start();
+  gameLoop.start();
 
   console.log(
     `[entry] running: HTTP ${staticDataService.config.HTTP_PORT}, WS ${staticDataService.config.WS_PORT}, tick ${staticDataService.config.TICK_INTERVAL_MS}ms`,

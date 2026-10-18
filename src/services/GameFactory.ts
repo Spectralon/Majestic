@@ -6,38 +6,24 @@ import type { StaticDataService } from "./StaticDataService.js";
 import type { ItemRegistryService } from "./ItemRegistryService.js";
 
 export class GameFactory {
-  private staticDataService: StaticDataService;
-  private itemRegistry: ItemRegistryService;
-  private world: WorldState | undefined = undefined;
+  private _staticDataService: StaticDataService;
+  private _itemRegistry: ItemRegistryService;
 
   constructor(staticDataService: StaticDataService, itemRegistry: ItemRegistryService) {
-    this.staticDataService = staticDataService;
-    this.itemRegistry = itemRegistry;
+    this._staticDataService = staticDataService;
+    this._itemRegistry = itemRegistry;
   }
 
   createGameWorld(): WorldState {
-    if (this.world !== undefined) {
-      throw new Error("createGameWorld: world already exists");
-    }
-    this.world = new WorldState(this.staticDataService.config);
-    return this.world;
-  }
-
-  private requireWorld(): WorldState {
-    if (this.world === undefined) {
-      throw new Error("call createGameWorld first");
-    }
-    return this.world;
+    return new WorldState(this._staticDataService.config);
   }
 
   createPlayer(id: string, position: Vec2): Player {
-    const player = new Player(id, position, this.staticDataService.config);
-    this.requireWorld().addPlayer(player);
-    return player;
+    return new Player(id, position, this._staticDataService.config);
   }
 
   createAllItems(): void {
-    const items = this.staticDataService.config.ITEMS;
-    this.itemRegistry.register(new Medkit(items.medkit.addHP));
+    const items = this._staticDataService.config.ITEMS;
+    this._itemRegistry.register(new Medkit(items.medkit.addHP));
   }
 }

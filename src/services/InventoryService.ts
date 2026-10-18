@@ -1,10 +1,10 @@
-import type { WorldState } from "../core/world.js";
 import type { IStorage } from "../storage/IStorage.js";
+import type { GameLoopService } from "./GameLoopService.js";
 
 export class InventoryService {
   constructor(
-    private world: WorldState,
-    private storage: IStorage,
+    private _gameLoop: GameLoopService,
+    private _storage: IStorage,
   ) {}
 
   async give(playerId: string, type: string): Promise<void> {

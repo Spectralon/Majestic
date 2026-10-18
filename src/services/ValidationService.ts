@@ -1,9 +1,9 @@
-import type { WorldState } from "../core/world.js";
+import type { GameLoopService } from "./GameLoopService.js";
 
 export type ValidationResult = { ok: true } | { ok: false; reason: string };
 
 export class ValidationService {
-  constructor(private world: WorldState) {}
+  constructor(private gameLoop: GameLoopService) {}
 
   validateMove(playerId: string, x: number, y: number): ValidationResult {
     throw new Error("Not implemented");

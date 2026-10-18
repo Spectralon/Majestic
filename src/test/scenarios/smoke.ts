@@ -2,17 +2,26 @@ import assert from "node:assert";
 import { StaticDataService } from "../../services/StaticDataService.js";
 import { ItemRegistryService } from "../../services/ItemRegistryService.js";
 import { GameFactory } from "../../services/GameFactory.js";
+import { EffectService } from "../../services/EffectService.js";
+import { GameLoopService } from "../../services/GameLoopService.js";
+import { MemoryStorage } from "../../storage/MemoryStorage.js";
 
 export const smoke = {
   name: "smoke",
   async run(): Promise<void> {
     const staticDataService = new StaticDataService();
     const itemRegistry = new ItemRegistryService();
+    const storage = new MemoryStorage(staticDataService.config.STORAGE_DELAY_MS);
     const factory = new GameFactory(staticDataService, itemRegistry);
-    const world = factory.createGameWorld();
     factory.createAllItems();
 
+    const effectService = new EffectService();
+    const gameLoop = new GameLoopService(factory, effectService, storage, () => {});
+    gameLoop.initialize();
+    const world = gameLoop.world;
+
     const player = factory.createPlayer("p1", { x: 100, y: 100 });
+    world.addPlayer(player);
 
     assert.strictEqual(player.hp, staticDataService.config.PLAYER.spawnHP);
     assert.strictEqual(player.armor, staticDataService.config.PLAYER.spawnArmor);

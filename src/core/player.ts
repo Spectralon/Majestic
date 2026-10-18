@@ -3,6 +3,7 @@ import { validatePosition, validateAmount, validateStat } from "../utils/validat
 
 export class Player {
   readonly id: string;
+  
   private readonly _config: any;
   private _position: Vec2;
   private _target: Vec2 | null = null;
