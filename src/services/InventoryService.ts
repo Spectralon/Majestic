@@ -8,24 +8,25 @@ import { sqrDistance } from "../utils/distance.js";
 import {WorldState} from "../core/world";
 
 export class InventoryService {
-  private _world: WorldState;
   private _storage: IStorage;
   private _itemRegistry: ItemRegistryService;
   private _gameFactory: GameFactory;
-  private _staticDataService: StaticDataService;
+
+  private readonly _world: WorldState;
+  private readonly _pickupRadiusSqr: number;
 
   constructor(
-    gameLoop: GameLoopService,
-    storage: IStorage,
-    itemRegistry: ItemRegistryService,
-    gameFactory: GameFactory,
-    staticDataService: StaticDataService,
+      gameLoop: GameLoopService,
+      storage: IStorage,
+      itemRegistry: ItemRegistryService,
+      gameFactory: GameFactory,
+      staticDataService: StaticDataService,
   ) {
     this._storage = storage;
     this._itemRegistry = itemRegistry;
     this._gameFactory = gameFactory;
-    this._staticDataService = staticDataService;
     this._world = gameLoop.world;
+    this._pickupRadiusSqr = staticDataService.config.PLAYER.pickupRadius;
   }
 
   getInventory(playerId: string): ItemInstance[] {
@@ -62,10 +63,8 @@ export class InventoryService {
 
     const groundItem = this._world.getGroundItemById(groundItemId);
 
-    const radius = this._staticDataService.config.PLAYER.pickupRadius;
-    if (sqrDistance(player.position, groundItem.position) > radius * radius) {
+    if (sqrDistance(player.position, groundItem.position) > this._pickupRadiusSqr)
       throw new Error("pickup: ground item out of range");
-    }
 
     const item = this._itemRegistry.get(groundItem.type);
 
