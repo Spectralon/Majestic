@@ -42,7 +42,10 @@ export class ValidationService {
 
   validateUse(playerId: string, type: string): ValidationResult {
     const player = this._gameLoop.world.getPlayer(playerId);
-    this._itemRegistry.get(type);
+    const item = this._itemRegistry.get(type);
+    if (!item.onUse) {
+      return { ok: false, reason: "item cannot be used" };
+    }
     if (!player.inventory.hasItemOfType(type)) {
       return { ok: false, reason: "item not in inventory" };
     }
