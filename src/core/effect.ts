@@ -6,13 +6,16 @@ export class ActiveEffect implements IEffect {
   private _remainingTicks: number;
 
   constructor(type: string, remainingTicks: number, data?: Record<string, number>) {
-    if (!type) throw new Error("ActiveEffect: type must be non-empty");
-    if (!Number.isInteger(remainingTicks) || remainingTicks < 0) {
+    if (!type)
+      throw new Error("ActiveEffect: type must be non-empty");
+    if (!Number.isInteger(remainingTicks) || remainingTicks < 0)
       throw new Error("ActiveEffect: remainingTicks must be a non-negative integer");
-    }
     this.type = type;
     this._remainingTicks = remainingTicks;
-    this.data = data === undefined ? undefined : { ...data };
+    this.data =
+        data === undefined
+            ? undefined
+            : { ...data };
   }
 
   get remainingTicks(): number {

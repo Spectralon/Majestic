@@ -17,13 +17,11 @@ export class EffectService implements ITickable {
 
   tick(): void {
     const world = this._gameLoop.world;
-    for (const player of world.getPlayers()) {
-      for (const effect of player.effects) {
-        const item = this._itemRegistry.get(effect.type);
-        if (item?.onUse) {
-          item.onUse(player, world);
-        }
-      }
+    for (const player of world.getPlayers())
+    for (const effect of player.effects) {
+      const item = this._itemRegistry.get(effect.type);
+      if (item?.onUse)
+        item.onUse(player, world);
     }
   }
 }

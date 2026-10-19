@@ -12,7 +12,7 @@ export const smoke = {
     const staticDataService = new StaticDataService();
     const itemRegistry = new ItemRegistryService();
     const storage = new MemoryStorage(staticDataService.config.STORAGE_DELAY_MS);
-    const gameLoop = new GameLoopService(() => {}, staticDataService.config.TICK_INTERVAL_MS);
+    const gameLoop = new GameLoopService(staticDataService.config.TICK_INTERVAL_MS, () => {});
     const effectService = new EffectService(gameLoop, itemRegistry);
     const factory = new GameFactory(staticDataService, itemRegistry, gameLoop);
     factory.createAllItems();

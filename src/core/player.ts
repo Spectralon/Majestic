@@ -89,10 +89,6 @@ export class Player implements ITickable {
     this._effects = this._effects.filter((effect) => effect.type !== type);
   }
 
-  private advanceEffects(): void {
-    this._effects = this._effects.filter((effect) => effect !== null && effect.remainingTicks >= 0);
-  }
-
   tick(): void {
     this.advanceEffects();
   }
@@ -106,5 +102,9 @@ export class Player implements ITickable {
       armor: this._armor,
       effects: this._effects.map((effect) => effect.clone()),
     };
+  }
+
+  private advanceEffects(): void {
+    this._effects = this._effects.filter((effect) => effect !== null && effect.remainingTicks >= 0);
   }
 }

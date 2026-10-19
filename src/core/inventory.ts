@@ -22,7 +22,8 @@ export class Inventory {
 
   removeItem(item: IItem): ItemInstance {
     const idx = this._items.findIndex((i) => i.type === item.type);
-    if (idx === -1) throw new Error(`Item not found in inventory: ${item.type}`);
+    if (idx === -1)
+      throw new Error(`Item not found in inventory: ${item.type}`);
     const existing = this._items[idx];
     if (existing.amount > 1) {
       const updated: ItemInstance = { ...existing, amount: existing.amount - 1 };
