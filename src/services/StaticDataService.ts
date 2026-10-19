@@ -11,7 +11,7 @@ export class StaticDataService {
 
     PLAYER: {
       pickupRadius: 50,
-      speed: 2,
+      speed: 10,
       maxHP: 100,
       maxArmor: 100,
       spawnHP: 50,
