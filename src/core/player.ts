@@ -124,7 +124,11 @@ export class Player implements ITickable {
       target: this._target === null ? null : { ...this._target },
       hp: this._hp,
       armor: this._armor,
-      effects: this._effects.map((effect) => effect.clone()),
+      effects: this._effects.map((effect) => ({
+        type: effect.type,
+        remainingTicks: effect.remainingTicks,
+        data: effect.data ? { ...effect.data } : undefined,
+      })),
     };
   }
 }

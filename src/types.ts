@@ -11,7 +11,12 @@ export interface IEffect extends ITickable {
   readonly type: string;
   readonly remainingTicks: number;
   readonly data?: Record<string, number>;
-  clone(): IEffect;
+}
+
+export interface EffectData {
+  readonly type: string;
+  readonly remainingTicks: number;
+  readonly data?: Record<string, number>;
 }
 
 export interface PlayerData {
@@ -20,7 +25,7 @@ export interface PlayerData {
   readonly target: Vec2 | null;
   readonly hp: number;
   readonly armor: number;
-  readonly effects: IEffect[];
+  readonly effects: EffectData[];
 }
 
 export interface ItemInstance {

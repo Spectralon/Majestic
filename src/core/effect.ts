@@ -26,12 +26,4 @@ export class ActiveEffect implements IEffect {
     this._remainingTicks--;
     return this._remainingTicks > 0;
   }
-
-  clone(): IEffect {
-    return new ActiveEffect(
-      this.type,
-      this._remainingTicks,
-      this.data === undefined ? undefined : { ...this.data },
-    );
-  }
 }
