@@ -1,8 +1,10 @@
 import { Medkit } from "../items/medkit.js";
+import { Armor } from "../items/armor.js";
 import { Player } from "../core/player.js";
 import { WorldState } from "../core/world.js";
 import { ActiveEffect } from "../core/effect.js";
 import type { IEffect, Vec2 } from "../types.js";
+import type { IItem } from "../items/IItem.js";
 import type { GameLoopService } from "./GameLoopService.js";
 import type { StaticDataService } from "./StaticDataService.js";
 import type { ItemRegistryService } from "./ItemRegistryService.js";
@@ -32,9 +34,21 @@ export class GameFactory {
     return player;
   }
 
+  createMedkit(): IItem {
+    const item = new Medkit(this._staticDataService.config.ITEMS.medkit.addHP);
+    this._itemRegistry.register(item);
+    return item;
+  }
+
+  createArmor(): IItem {
+    const item = new Armor(this._staticDataService.config.ITEMS.armor.addArmor);
+    this._itemRegistry.register(item);
+    return item;
+  }
+
   createAllItems(): void {
-    const items = this._staticDataService.config.ITEMS;
-    this._itemRegistry.register(new Medkit(items.medkit.addHP));
+    this.createMedkit();
+    this.createArmor();
   }
 
   createEffect(type: string): IEffect {
