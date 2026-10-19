@@ -1,6 +1,7 @@
 import { Medkit } from "../items/medkit.js";
 import { Armor } from "../items/armor.js";
 import { Bandage } from "../items/bandage.js";
+import { Flare } from "../items/flare.js";
 import { Player } from "../core/player.js";
 import { WorldState } from "../core/world.js";
 import { ActiveEffect } from "../core/effect.js";
@@ -53,10 +54,17 @@ export class GameFactory {
     return item;
   }
 
+  createFlare(): IItem {
+    const item = new Flare();
+    this._itemRegistry.register(item);
+    return item;
+  }
+
   createAllItems(): void {
     this.createMedkit();
     this.createArmor();
     this.createBandage();
+    this.createFlare();
   }
 
   createEffect(type: string): IEffect {
