@@ -7,7 +7,6 @@ export class WorldState {
   private _tick: number = 0;
   private _players: Map<string, Player> = new Map();
   private _groundItems: Map<string, GroundItem> = new Map();
-  private _inventories: Map<string, ItemInstance[]> = new Map();
 
   constructor(config: any) {
     this._config = config;
@@ -18,19 +17,21 @@ export class WorldState {
   }
 
   addPlayer(player: Player): void {
-    if (this._players.has(player.id)) throw new Error(`Player already exists: ${player.id}`);
+    if (this._players.has(player.id))
+      throw new Error(`Player already exists: ${player.id}`);
     this._players.set(player.id, player);
-    this._inventories.set(player.id, []);
   }
 
   removePlayer(playerId: string): void {
-    if (!this._players.has(playerId)) throw new Error(`Player not found: ${playerId}`);
+    if (!this._players.has(playerId))
+      throw new Error(`Player not found: ${playerId}`);
     this._players.delete(playerId);
-    this._inventories.delete(playerId);
   }
 
-  getPlayer(playerId: string): Player | undefined {
-    return this._players.get(playerId);
+  getPlayer(playerId: string): Player {
+    if (!this._players.has(playerId))
+      throw new Error(`Player not found: ${playerId}`);
+    return this._players.get(playerId) as Player;
   }
 
   getPlayers(): Player[] {
@@ -38,8 +39,10 @@ export class WorldState {
   }
 
   addGroundItem(item: GroundItem): void {
-    if (!item.id) throw new Error("Ground item id must be non-empty");
-    if (!item.type) throw new Error("Ground item type must be non-empty");
+    if (!item.id)
+      throw new Error("Ground item id must be non-empty");
+    if (!item.type)
+      throw new Error("Ground item type must be non-empty");
     validatePosition(item.position, this._config.WORLD_WIDTH, this._config.WORLD_HEIGHT, "ground item position");
     this._groundItems.set(item.id, item);
   }
@@ -49,17 +52,14 @@ export class WorldState {
     this._groundItems.delete(itemId);
   }
 
+  getGroundItemById(id: string): GroundItem {
+    const item = this.getGroundItems().find((g) => g.id === id);
+    if (!item) throw new Error(`Ground item not found: ${item}`);
+    return item;
+  }
+
   getGroundItems(): GroundItem[] {
     return Array.from(this._groundItems.values());
-  }
-
-  getInventory(playerId: string): ItemInstance[] {
-    return this._inventories.get(playerId) ?? [];
-  }
-
-  setInventory(playerId: string, items: ItemInstance[]): void {
-    if (!this._players.has(playerId)) throw new Error(`Player not found: ${playerId}`);
-    this._inventories.set(playerId, items);
   }
 
   advanceTick(): void {
@@ -71,7 +71,7 @@ export class WorldState {
       tick: this._tick,
       players: this.getPlayers().map((player) => player.toData()),
       groundItems: this.getGroundItems(),
-      inventories: Object.fromEntries(this._inventories.entries()),
+      inventories: Object.fromEntries(this.getPlayers().map((p) => [p.id, [...p.inventory.items]])),
     };
   }
 }

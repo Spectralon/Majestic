@@ -24,7 +24,7 @@ async function main(): Promise<void> {
   gameLoop.initialize(world);
   effectService.initialize();
   const validationService = new ValidationService(gameLoop);
-  const inventoryService = new InventoryService(gameLoop, storage);
+  const inventoryService = new InventoryService(gameLoop, storage, itemRegistry, gameFactory, staticDataService);
   const server = new GameServer(gameFactory, validationService, inventoryService, gameLoop);
 
   await server.start();

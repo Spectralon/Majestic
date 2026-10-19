@@ -5,7 +5,7 @@ import { Flare } from "../items/flare.js";
 import { Player } from "../core/player.js";
 import { WorldState } from "../core/world.js";
 import { ActiveEffect } from "../core/effect.js";
-import type { IEffect, Vec2 } from "../types.js";
+import type { IEffect, Vec2, GroundItem } from "../types.js";
 import type { IItem } from "../items/IItem.js";
 import type { GameLoopService } from "./GameLoopService.js";
 import type { StaticDataService } from "./StaticDataService.js";
@@ -15,6 +15,8 @@ export class GameFactory {
   private _staticDataService: StaticDataService;
   private _itemRegistry: ItemRegistryService;
   private _gameLoop: GameLoopService;
+
+  private _groundItemCounter: number = 0;
 
   constructor(
     staticDataService: StaticDataService,
@@ -60,6 +62,16 @@ export class GameFactory {
     return item;
   }
 
+  createGroundItem(type: string, position: Vec2): GroundItem {
+    this._groundItemCounter++;
+    return {
+      id: `ground_${this._groundItemCounter}`,
+      type,
+      position: { ...position },
+      expiresAtTick: this._gameLoop.world.tick + this._staticDataService.config.GROUND_LIFETIME_TICKS,
+    };
+  }
+
   createAllItems(): void {
     this.createMedkit();
     this.createArmor();
@@ -68,6 +80,13 @@ export class GameFactory {
   }
 
   createEffect(type: string): IEffect {
+    const effect = this.createEffectOrNull(type);
+    if (!effect)
+      throw new Error(`createEffect: unknown effect type: ${type}`);
+    return effect;
+  }
+
+  createEffectOrNull(type: string): IEffect | null {
     const items = this._staticDataService.config.ITEMS;
     if (type === "bandage") {
       const effect = new ActiveEffect(type, items.bandage.duration, {
@@ -81,6 +100,6 @@ export class GameFactory {
       this._gameLoop.register(effect);
       return effect;
     }
-    throw new Error(`createEffect: unknown effect type: ${type}`);
+    return null;
   }
 }

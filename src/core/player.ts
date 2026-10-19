@@ -1,5 +1,6 @@
 import type { IEffect, ITickable, PlayerData, Vec2 } from "../types.js";
 import { validatePosition, validateAmount, validateStat } from "../utils/validation.js";
+import { Inventory } from "./inventory.js";
 
 export class Player implements ITickable {
   readonly id: string;
@@ -10,6 +11,7 @@ export class Player implements ITickable {
   private _hp: number;
   private _armor: number;
   private _effects: IEffect[] = [];
+  private readonly _inventory: Inventory = new Inventory();
 
   constructor(id: string, position: Vec2, config: any) {
     if (!id) throw new Error("Player id must be non-empty");
@@ -38,6 +40,10 @@ export class Player implements ITickable {
 
   get effects(): readonly IEffect[] {
     return this._effects;
+  }
+
+  get inventory(): Inventory {
+    return this._inventory;
   }
 
   addHP(amount: number): void {

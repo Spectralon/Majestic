@@ -7,8 +7,11 @@ export class ItemRegistryService {
     this._items.set(item.type, item);
   }
 
-  get(type: string): IItem | undefined {
-    return this._items.get(type);
+  get(type: string): IItem {
+    const item = this._items.get(type);
+    if (!item)
+      throw new Error(`Unknown item type: ${type}`);
+    return item;
   }
 
   getAll(): IItem[] {

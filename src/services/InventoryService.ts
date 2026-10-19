@@ -1,24 +1,100 @@
 import type { IStorage } from "../storage/IStorage.js";
 import type { GameLoopService } from "./GameLoopService.js";
+import type { ItemRegistryService } from "./ItemRegistryService.js";
+import type { GameFactory } from "./GameFactory.js";
+import type { StaticDataService } from "./StaticDataService.js";
+import type { ItemInstance } from "../types.js";
+import { sqrDistance } from "../utils/distance.js";
+import {WorldState} from "../core/world";
 
 export class InventoryService {
-  constructor(
-    private _gameLoop: GameLoopService,
-    private _storage: IStorage,
-  ) {}
+  private _world: WorldState;
+  private _storage: IStorage;
+  private _itemRegistry: ItemRegistryService;
+  private _gameFactory: GameFactory;
+  private _staticDataService: StaticDataService;
 
-  async give(playerId: string, type: string): Promise<void> {
+  constructor(
+    gameLoop: GameLoopService,
+    storage: IStorage,
+    itemRegistry: ItemRegistryService,
+    gameFactory: GameFactory,
+    staticDataService: StaticDataService,
+  ) {
+    this._storage = storage;
+    this._itemRegistry = itemRegistry;
+    this._gameFactory = gameFactory;
+    this._staticDataService = staticDataService;
+    this._world = gameLoop.world;
   }
 
-  async drop(playerId: string, instanceId: string): Promise<void> {
+  getInventory(playerId: string): ItemInstance[] {
+    const player = this._world.getPlayer(playerId);
+    return [...player.inventory.items];
+  }
+
+  async give(playerId: string, type: string, amount: number = 1): Promise<void> {
+    const player = this._world.getPlayer(playerId);
+    const item = this._itemRegistry.get(type);
+
+    if (!Number.isInteger(amount) || amount < 1)
+      throw new Error("give: amount must be a positive integer");
+
+    player.inventory.addItem(item, amount);
+    await this._storage.saveInventory(playerId, [...player.inventory.items]);
+  }
+
+  async drop(playerId: string, type: string): Promise<void> {
+    const player = this._world.getPlayer(playerId);
+    const item = this._itemRegistry.get(type);
+
+    player.inventory.removeItem(item);
+    await this._storage.saveInventory(playerId, [...player.inventory.items]);
+
+    const groundItem = this._gameFactory.createGroundItem(type, player.position);
+    this._world.addGroundItem(groundItem);
+    await this._storage.saveGroundItem(groundItem);
   }
 
   async pickup(playerId: string, groundItemId: string): Promise<void> {
+    const player = this._world.getPlayer(playerId);
+
+    const groundItem = this._world.getGroundItemById(groundItemId);
+
+    const radius = this._staticDataService.config.PLAYER.pickupRadius;
+    if (sqrDistance(player.position, groundItem.position) > radius * radius) {
+      throw new Error("pickup: ground item out of range");
+    }
+
+    const item = this._itemRegistry.get(groundItem.type);
+
+    this._world.removeGroundItem(groundItemId);
+    await this._storage.deleteGroundItem(groundItemId);
+
+    player.inventory.addItem(item);
+    await this._storage.saveInventory(playerId, [...player.inventory.items]);
   }
 
-  async use(playerId: string, instanceId: string): Promise<void> {
+  async use(playerId: string, type: string): Promise<void> {
+    const player = this._world.getPlayer(playerId);
+    const item = this._itemRegistry.get(type);
+
+    const effect = this._gameFactory.createEffectOrNull(type);
+    if (effect) {
+      player.addEffect(effect);
+    } else if (item.onUse) {
+      item.onUse(player, this._world);
+    }
+
+    player.inventory.removeItem(item);
+    await this._storage.saveInventory(playerId, [...player.inventory.items]);
   }
 
   async loadInventory(playerId: string): Promise<void> {
+    const player = this._world.getPlayer(playerId);
+
+    const items = await this._storage.loadInventory(playerId);
+    if (!items) return;
+    player.inventory.load(items);
   }
 }
