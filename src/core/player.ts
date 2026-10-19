@@ -91,6 +91,24 @@ export class Player implements ITickable {
 
   tick(): void {
     this.advanceEffects();
+    this.moveTowardTarget();
+  }
+
+  private moveTowardTarget(): void {
+    if (this._target === null) return;
+    const dx = this._target.x - this._position.x;
+    const dy = this._target.y - this._position.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const speed = this._config.PLAYER.speed;
+    if (dist <= speed) {
+      this._position = { x: this._target.x, y: this._target.y };
+      this._target = null;
+    } else {
+      this._position = {
+        x: this._position.x + (dx / dist) * speed,
+        y: this._position.y + (dy / dist) * speed,
+      };
+    }
   }
 
   toData(): PlayerData {
