@@ -56,6 +56,7 @@ export class InventoryService {
 
     const groundItem = this._gameFactory.createGroundItem(type, player.position);
     this._world.addGroundItem(groundItem);
+    item.onDrop?.(player);
     await this._storage.saveGroundItem(groundItem);
   }
 
@@ -85,7 +86,7 @@ export class InventoryService {
     if (effect) {
       player.addEffect(effect);
     } else if (item.onUse) {
-      item.onUse(player, this._world);
+      item.onUse(player);
     }
 
     player.inventory.removeItem(item);

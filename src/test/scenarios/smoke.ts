@@ -2,6 +2,7 @@ import assert from "node:assert";
 import { StaticDataService } from "../../services/StaticDataService.js";
 import { ItemRegistryService } from "../../services/ItemRegistryService.js";
 import { GameFactory } from "../../services/GameFactory.js";
+import { FlareService } from "../../services/FlareService.js";
 import { EffectService } from "../../services/EffectService.js";
 import { GameLoopService } from "../../services/GameLoopService.js";
 import { MemoryStorage } from "../../storage/MemoryStorage.js";
@@ -14,7 +15,9 @@ export const smoke = {
     const storage = new MemoryStorage(staticDataService.config.STORAGE_DELAY_MS);
     const gameLoop = new GameLoopService(staticDataService.config.TICK_INTERVAL_MS, () => {});
     const effectService = new EffectService(gameLoop, itemRegistry);
-    const factory = new GameFactory(staticDataService, itemRegistry, gameLoop);
+    const flareService = new FlareService(gameLoop, staticDataService);
+    const factory = new GameFactory(staticDataService, itemRegistry, gameLoop, flareService);
+    flareService.initialize(factory);
     factory.createAllItems();
     const world = factory.createGameWorld();
     gameLoop.initialize(world);
@@ -31,7 +34,7 @@ export const smoke = {
       throw new Error("medkit is not registered");
     }
 
-    medkit.onUse(player, world);
+    medkit.onUse(player);
     assert.strictEqual(player.hp, staticDataService.config.PLAYER.maxHP);
 
     world.advanceTick();

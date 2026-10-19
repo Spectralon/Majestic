@@ -21,7 +21,7 @@ export class EffectService implements ITickable {
     for (const effect of player.effects) {
       const item = this._itemRegistry.get(effect.type);
       if (item?.onUse)
-        item.onUse(player, world);
+        item.onUse(player);
     }
   }
 }

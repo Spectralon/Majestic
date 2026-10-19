@@ -4,6 +4,7 @@ import { ItemRegistryService } from "./services/ItemRegistryService.js";
 import { GameFactory } from "./services/GameFactory.js";
 import { EffectService } from "./services/EffectService.js";
 import { GroundItemService } from "./services/GroundItemService.js";
+import { FlareService } from "./services/FlareService.js";
 import { InventoryService } from "./services/InventoryService.js";
 import { ValidationService } from "./services/ValidationService.js";
 import { GameLoopService } from "./services/GameLoopService.js";
@@ -20,7 +21,9 @@ async function main(): Promise<void> {
     (snapshot) => server.broadcast(snapshot),
   );
   const effectService = new EffectService(gameLoop, itemRegistry);
-  const gameFactory = new GameFactory(staticDataService, itemRegistry, gameLoop);
+  const flareService = new FlareService(gameLoop, staticDataService);
+  const gameFactory = new GameFactory(staticDataService, itemRegistry, gameLoop, flareService);
+  flareService.initialize(gameFactory);
   gameFactory.createAllItems();
   const world = gameFactory.createGameWorld();
   gameLoop.initialize(world);

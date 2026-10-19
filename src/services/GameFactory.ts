@@ -10,11 +10,13 @@ import type { IItem } from "../items/IItem.js";
 import type { GameLoopService } from "./GameLoopService.js";
 import type { StaticDataService } from "./StaticDataService.js";
 import type { ItemRegistryService } from "./ItemRegistryService.js";
+import type { FlareService } from "./FlareService.js";
 
 export class GameFactory {
   private _staticDataService: StaticDataService;
   private _itemRegistry: ItemRegistryService;
   private _gameLoop: GameLoopService;
+  private _flareService: FlareService;
 
   private _groundItemCounter: number = 0;
   private _instanceCounter: number = 0;
@@ -23,10 +25,12 @@ export class GameFactory {
     staticDataService: StaticDataService,
     itemRegistry: ItemRegistryService,
     gameLoop: GameLoopService,
+    flareService: FlareService,
   ) {
     this._staticDataService = staticDataService;
     this._itemRegistry = itemRegistry;
     this._gameLoop = gameLoop;
+    this._flareService = flareService;
   }
 
   createGameWorld(): WorldState {
@@ -58,7 +62,7 @@ export class GameFactory {
   }
 
   createFlare(): IItem {
-    const item = new Flare();
+    const item = new Flare(this._flareService);
     this._itemRegistry.register(item);
     return item;
   }

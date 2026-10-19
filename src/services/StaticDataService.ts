@@ -38,6 +38,7 @@ export class StaticDataService {
       flare: {
         color: "#ffaa00",
         radius: 8,
+        highlightRadius: 100,
         highlightTicks: 30,
       },
     },

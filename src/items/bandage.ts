@@ -8,7 +8,7 @@ export class Bandage implements IItem {
 
   constructor(private _healPerTick: number) {}
 
-  onUse(player: Player, world: WorldState): void {
+  onUse(player: Player): void {
     player.addHP(this._healPerTick);
   }
 }
