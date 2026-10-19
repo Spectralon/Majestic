@@ -3,25 +3,21 @@ import type { ItemInstance } from "../types.js";
 
 export class Inventory {
   private _items: ItemInstance[] = [];
-  private _counter: number = 0;
 
   get items(): readonly ItemInstance[] {
     return this._items;
   }
 
-  addItem(item: IItem, amount: number = 1): ItemInstance {
+  addItem(item: IItem, instance: ItemInstance): void {
     if (item.stackable) {
       const idx = this._items.findIndex((i) => i.type === item.type);
       if (idx !== -1) {
-        const updated: ItemInstance = { ...this._items[idx], amount: this._items[idx].amount + amount };
+        const updated: ItemInstance = { ...this._items[idx], amount: this._items[idx].amount + instance.amount };
         this._items = [...this._items.slice(0, idx), updated, ...this._items.slice(idx + 1)];
-        return updated;
+        return;
       }
     }
-    this._counter++;
-    const instance: ItemInstance = { id: `inst_${this._counter}`, type: item.type, amount: item.stackable ? amount : 1 };
     this._items = [...this._items, instance];
-    return instance;
   }
 
   removeItem(item: IItem): ItemInstance {
@@ -39,10 +35,6 @@ export class Inventory {
 
   load(items: ItemInstance[]): void {
     this._items = [...items];
-    this._counter = items.reduce((max, i) => {
-      const num = parseInt(i.id.replace("inst_", ""), 10);
-      return Number.isNaN(num) ? max : Math.max(max, num);
-    }, 0);
   }
 
   hasItemOfType(type: string): boolean {

@@ -5,7 +5,7 @@ import { Flare } from "../items/flare.js";
 import { Player } from "../core/player.js";
 import { WorldState } from "../core/world.js";
 import { ActiveEffect } from "../core/effect.js";
-import type { IEffect, Vec2, GroundItem } from "../types.js";
+import type { IEffect, Vec2, GroundItem, ItemInstance } from "../types.js";
 import type { IItem } from "../items/IItem.js";
 import type { GameLoopService } from "./GameLoopService.js";
 import type { StaticDataService } from "./StaticDataService.js";
@@ -17,6 +17,7 @@ export class GameFactory {
   private _gameLoop: GameLoopService;
 
   private _groundItemCounter: number = 0;
+  private _instanceCounter: number = 0;
 
   constructor(
     staticDataService: StaticDataService,
@@ -70,6 +71,11 @@ export class GameFactory {
       position: { ...position },
       expiresAtTick: this._gameLoop.world.tick + this._staticDataService.config.GROUND_LIFETIME_TICKS,
     };
+  }
+
+  createItemInstance(type: string, amount: number): ItemInstance {
+    this._instanceCounter++;
+    return { id: `inst_${this._instanceCounter}`, type, amount };
   }
 
   createAllItems(): void {

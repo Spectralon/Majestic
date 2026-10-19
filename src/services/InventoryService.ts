@@ -40,7 +40,8 @@ export class InventoryService {
     if (!Number.isInteger(amount) || amount < 1)
       throw new Error("give: amount must be a positive integer");
 
-    player.inventory.addItem(item, amount);
+    const instance = this._gameFactory.createItemInstance(type, amount);
+    player.inventory.addItem(item, instance);
     await this._storage.saveInventory(playerId, [...player.inventory.items]);
   }
 
@@ -71,7 +72,8 @@ export class InventoryService {
     this._world.removeGroundItem(groundItemId);
     await this._storage.deleteGroundItem(groundItemId);
 
-    player.inventory.addItem(item);
+    const instance = this._gameFactory.createItemInstance(groundItem.type, 1);
+    player.inventory.addItem(item, instance);
     await this._storage.saveInventory(playerId, [...player.inventory.items]);
   }
 
