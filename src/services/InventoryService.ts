@@ -26,7 +26,8 @@ export class InventoryService {
     this._itemRegistry = itemRegistry;
     this._gameFactory = gameFactory;
     this._world = gameLoop.world;
-    this._pickupRadiusSqr = staticDataService.config.PLAYER.pickupRadius;
+    const r = staticDataService.config.PLAYER.pickupRadius;
+    this._pickupRadiusSqr = r * r;
   }
 
   getInventory(playerId: string): ItemInstance[] {
