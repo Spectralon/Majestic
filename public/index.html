@@ -15,13 +15,19 @@
     button:hover { background: #3a3a5e; }
     .inv { font-size: 12px; color: #8f8; margin-top: 4px; }
     .status { font-size: 12px; color: #888; margin-top: 12px; }
+    #invSection { display: none; }
   </style>
 </head>
 <body>
   <canvas id="world" width="800" height="600"></canvas>
   <div class="panel">
-    <h3>Inventory</h3>
-    <div class="inv" id="inv">—</div>
+    <h4>World</h4>
+    <button onclick="sendRaw({cmd:'spawnPlayer'})">Spawn Player</button>
+    <button onclick="sendRaw({cmd:'spawnItem'})">Spawn Item</button>
+    <div id="invSection">
+      <h3>Inventory</h3>
+      <div class="inv" id="inv">—</div>
+    </div>
     <h4>Give</h4>
     <button onclick="send({cmd:'give',type:'medkit'})">Medkit</button>
     <button onclick="send({cmd:'give',type:'bandage'})">Bandage</button>
@@ -37,8 +43,7 @@
     <button onclick="send({cmd:'drop',type:'bandage'})">Drop Bandage</button>
     <button onclick="send({cmd:'drop',type:'armor'})">Drop Armor</button>
     <button onclick="send({cmd:'drop',type:'flare'})">Drop Flare</button>
-    <h4>Pickup</h4>
-    <p class="status">Click ground item on canvas</p>
+    <p class="status">LMB player — control | LMB field — move | RMB — inventory</p>
     <p class="status" id="status">connecting...</p>
   </div>
   <script src="app.js"></script>

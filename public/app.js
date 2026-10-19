@@ -3,9 +3,8 @@ const ctx = canvas.getContext("2d");
 const COLORS = { medkit: "#ff4444", armor: "#4488ff", bandage: "#44ff44", flare: "#ffaa00" };
 
 let ws;
-let playerId = null;
+let controlledPlayerId = null;
 let snapshot = null;
-let myInventory = [];
 
 function connect() {
   document.getElementById("status").textContent = "connecting...";
@@ -15,13 +14,8 @@ function connect() {
   };
   ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    if (data.playerId) {
-      playerId = data.playerId;
-    } else if (data.error) {
+    if (data.error) {
       document.getElementById("status").textContent = "error: " + data.error;
-    } else if (data.inventory) {
-      myInventory = data.inventory;
-      renderInv();
     } else if (data.tick !== undefined) {
       snapshot = data;
       render();
@@ -33,9 +27,14 @@ function connect() {
   };
 }
 
+function sendRaw(cmd) {
+  if (!ws || ws.readyState !== 1) return;
+  ws.send(JSON.stringify(cmd));
+}
+
 function send(cmd) {
-  if (!playerId || !ws || ws.readyState !== 1) return;
-  cmd.playerId = playerId;
+  if (!controlledPlayerId || !ws || ws.readyState !== 1) return;
+  cmd.playerId = controlledPlayerId;
   ws.send(JSON.stringify(cmd));
 }
 
@@ -60,7 +59,7 @@ function render() {
   for (const p of snapshot.players) {
     ctx.beginPath();
     ctx.arc(p.position.x, p.position.y, 15, 0, Math.PI * 2);
-    ctx.fillStyle = p.id === playerId ? "#00ff88" : "#ff8800";
+    ctx.fillStyle = p.id === controlledPlayerId ? "#00ff88" : "#ff8800";
     ctx.fill();
     ctx.fillStyle = "#fff";
     ctx.font = "bold 11px sans-serif";
@@ -76,18 +75,35 @@ function render() {
   ctx.fillStyle = "#666";
   ctx.font = "12px monospace";
   ctx.fillText(`tick: ${snapshot.tick}`, 10, 20);
+  renderInv();
 }
 
 function renderInv() {
   const el = document.getElementById("inv");
-  el.textContent = myInventory.length ? myInventory.map((i) => `${i.type} x${i.amount}`).join(", ") : "empty";
+  if (!controlledPlayerId || !snapshot) {
+    el.textContent = "click a player to control";
+    return;
+  }
+  const items = snapshot.inventories[controlledPlayerId];
+  el.textContent = items && items.length ? items.map((i) => `${i.type} x${i.amount}`).join(", ") : "empty";
 }
 
 canvas.addEventListener("click", (e) => {
   if (!snapshot) return;
   const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+  const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+  for (const p of snapshot.players) {
+    const dx = x - p.position.x;
+    const dy = y - p.position.y;
+    if (dx * dx + dy * dy <= 225) {
+      controlledPlayerId = p.id;
+      document.getElementById("invSection").style.display = "block";
+      return;
+    }
+  }
+
   for (const item of snapshot.groundItems) {
     const dx = x - item.position.x;
     const dy = y - item.position.y;
@@ -96,6 +112,16 @@ canvas.addEventListener("click", (e) => {
       return;
     }
   }
+
+  if (controlledPlayerId) {
+    send({ cmd: "setTarget", x, y });
+  }
+});
+
+canvas.addEventListener("contextmenu", (e) => {
+  e.preventDefault();
+  const section = document.getElementById("invSection");
+  section.style.display = section.style.display === "none" ? "block" : "none";
 });
 
 connect();
