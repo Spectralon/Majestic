@@ -15,7 +15,7 @@ export class EffectService implements ITickable {
     this._gameLoop.register(this);
   }
 
-  tick(): void {
+  tick(): boolean {
     const world = this._gameLoop.world;
     for (const player of world.getPlayers())
     for (const effect of player.effects) {
@@ -23,5 +23,6 @@ export class EffectService implements ITickable {
       if (item?.onUse)
         item.onUse(player);
     }
+    return true;
   }
 }

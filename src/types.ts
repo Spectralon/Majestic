@@ -4,7 +4,7 @@ export interface Vec2 {
 }
 
 export interface ITickable {
-  tick(): void;
+  tick(): boolean;
 }
 
 export interface IEffect extends ITickable {

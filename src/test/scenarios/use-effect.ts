@@ -37,5 +37,17 @@ export const useEffect = {
     await inventoryService.use("p1", "medkit");
     assert.strictEqual(player.hp, staticDataService.config.PLAYER.maxHP);
     assert.strictEqual(inventoryService.getInventory("p1").length, 0);
+
+    const player2 = factory.createPlayer("p2", { x: 200, y: 200 });
+    world.addPlayer(player2);
+    await inventoryService.give("p2", "bandage");
+    await inventoryService.use("p2", "bandage");
+    assert.strictEqual(player2.effects.length, 1);
+    for (let i = 0; i < 5; i++) {
+      gameLoop.tick();
+    }
+    const bandage = staticDataService.config.ITEMS.bandage;
+    assert.strictEqual(player2.hp, staticDataService.config.PLAYER.spawnHP + bandage.healPerTick * (bandage.duration + 1));
+    assert.strictEqual(player2.effects.length, 0);
   },
 };

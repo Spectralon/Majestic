@@ -38,12 +38,7 @@ export class GameLoopService {
   }
 
   tick(): void {
-    this._tickables.forEach((tickable) => {
-      if (tickable !== null) {
-        tickable.tick();
-      }
-    });
-    this._tickables = this._tickables.filter((tickable) => tickable !== null);
+    this._tickables = this._tickables.filter((tickable) => tickable.tick());
 
     this.world.advanceTick();
 

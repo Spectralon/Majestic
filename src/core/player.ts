@@ -14,7 +14,8 @@ export class Player implements ITickable {
   private readonly _inventory: Inventory = new Inventory();
 
   constructor(id: string, position: Vec2, config: any) {
-    if (!id) throw new Error("Player id must be non-empty");
+    if (!id)
+      throw new Error("Player id must be non-empty");
     this.id = id;
     this._config = config;
     this._position = validatePosition(position, config.WORLD_WIDTH, config.WORLD_HEIGHT, "Player position");
@@ -89,9 +90,10 @@ export class Player implements ITickable {
     this._effects = this._effects.filter((effect) => effect.type !== type);
   }
 
-  tick(): void {
+  tick(): boolean {
     this.advanceEffects();
     this.moveTowardTarget();
+    return true;
   }
 
   private moveTowardTarget(): void {
@@ -111,6 +113,10 @@ export class Player implements ITickable {
     }
   }
 
+  private advanceEffects(): void {
+    this._effects = this._effects.filter((effect) => effect?.remainingTicks > 0);
+  }
+
   toData(): PlayerData {
     return {
       id: this.id,
@@ -120,9 +126,5 @@ export class Player implements ITickable {
       armor: this._armor,
       effects: this._effects.map((effect) => effect.clone()),
     };
-  }
-
-  private advanceEffects(): void {
-    this._effects = this._effects.filter((effect) => effect !== null && effect.remainingTicks >= 0);
   }
 }

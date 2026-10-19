@@ -22,8 +22,9 @@ export class ActiveEffect implements IEffect {
     return this._remainingTicks;
   }
 
-  tick(): void {
+  tick(): boolean {
     this._remainingTicks--;
+    return this._remainingTicks > 0;
   }
 
   clone(): IEffect {

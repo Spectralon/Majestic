@@ -15,7 +15,7 @@ export class GroundItemService implements ITickable {
     this._gameLoop.register(this);
   }
 
-  tick(): void {
+  tick(): boolean {
     const world = this._gameLoop.world;
     const expired =
         world
@@ -26,5 +26,6 @@ export class GroundItemService implements ITickable {
       world.removeGroundItem(item.id);
       this._storage.deleteGroundItem(item.id);
     }
+    return true;
   }
 }
