@@ -1,6 +1,5 @@
 import type { WorldState } from "../core/world.js";
 import type { IStorage } from "../storage/IStorage.js";
-import type { EffectService } from "./EffectService.js";
 import type { ITickable, WorldSnapshot } from "../types.js";
 
 export class GameLoopService {
@@ -8,7 +7,6 @@ export class GameLoopService {
   private _tickables: ITickable[] = [];
 
   constructor(
-    private _effectService: EffectService,
     private _storage: IStorage,
     private _broadcast: (snapshot: WorldSnapshot) => void,
   ) {}

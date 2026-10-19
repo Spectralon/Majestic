@@ -14,14 +14,15 @@ async function main(): Promise<void> {
   const staticDataService = new StaticDataService();
   const storage = new MemoryStorage(staticDataService.config.STORAGE_DELAY_MS);
   const itemRegistry = new ItemRegistryService();
-  const effectService = new EffectService();
-  const gameLoop = new GameLoopService(effectService, storage, (snapshot) =>
+  const gameLoop = new GameLoopService(storage, (snapshot) =>
     server.broadcast(snapshot),
   );
+  const effectService = new EffectService(gameLoop);
   const gameFactory = new GameFactory(staticDataService, itemRegistry, gameLoop);
   gameFactory.createAllItems();
   const world = gameFactory.createGameWorld();
   gameLoop.initialize(world);
+  effectService.initialize();
   const validationService = new ValidationService(gameLoop);
   const inventoryService = new InventoryService(gameLoop, storage);
   const server = new GameServer(gameFactory, validationService, inventoryService, gameLoop);

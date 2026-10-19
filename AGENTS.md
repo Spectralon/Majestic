@@ -37,7 +37,7 @@ Always use CONTINUABLE subagents (run_in_background: true). NEVER EVER USE ONE-S
 - Method stub with a return type: `throw new Error("Not implemented")` — that is code, not a comment; it does land in commits.
 - Commits are made by the user; the coordinator only prepares files and verifies. The workspace is **not** a git repository.
 - **Constructors:** a ctor only receives and stores references to the services it needs (DI). Creating objects inside a constructor is forbidden. Creation/initialization — in separate methods (`initialize()` pattern). The factory is stateless: it does not hold `WorldState`, and there are no "already created" checks.
-- **Owner of `WorldState`** — `GameLoopService`: creates the world in `initialize()` via the factory; exposed outward only through the readonly getter `world`. Services do not receive `WorldState` in constructors — they either hold a reference to `GameLoopService` or receive the world as a method argument (`EffectService.tick(world)`).
+- **Owner of `WorldState`** — `GameLoopService`: creates the world in `initialize()` via the factory; exposed outward only through the readonly getter `world`. Services do not receive `WorldState` in constructors — they hold a reference to `GameLoopService` and read the world from its getter.
 - **Validator naming:** `validate<Thing>` (the method THROWS on error and returns the value). Names of the form `valid<Thing>` are forbidden — they look like a boolean check.
 - **Encapsulation:** the owner of a state validates its own fields; items/services NEVER clamp or validate numbers — they only call the owner's methods (Medkit: `player.addHP(this.addHP)`).
 - Private variable names start with an underscore `_`.
