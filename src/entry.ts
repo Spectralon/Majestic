@@ -17,7 +17,7 @@ async function main(): Promise<void> {
   const gameLoop = new GameLoopService(storage, (snapshot) =>
     server.broadcast(snapshot),
   );
-  const effectService = new EffectService(gameLoop);
+  const effectService = new EffectService(gameLoop, itemRegistry);
   const gameFactory = new GameFactory(staticDataService, itemRegistry, gameLoop);
   gameFactory.createAllItems();
   const world = gameFactory.createGameWorld();
