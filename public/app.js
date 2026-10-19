@@ -57,6 +57,15 @@ function render() {
   }
 
   for (const p of snapshot.players) {
+    if (p.effects.some((e) => e.type === "flare")) {
+      ctx.beginPath();
+      ctx.arc(p.position.x, p.position.y, 30, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255, 170, 0, 0.3)";
+      ctx.fill();
+      ctx.strokeStyle = "#ffaa00";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
     ctx.beginPath();
     ctx.arc(p.position.x, p.position.y, 15, 0, Math.PI * 2);
     ctx.fillStyle = p.id === controlledPlayerId ? "#00ff88" : "#ff8800";
