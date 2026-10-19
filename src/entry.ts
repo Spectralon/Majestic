@@ -3,6 +3,7 @@ import { StaticDataService } from "./services/StaticDataService.js";
 import { ItemRegistryService } from "./services/ItemRegistryService.js";
 import { GameFactory } from "./services/GameFactory.js";
 import { EffectService } from "./services/EffectService.js";
+import { GroundItemService } from "./services/GroundItemService.js";
 import { InventoryService } from "./services/InventoryService.js";
 import { ValidationService } from "./services/ValidationService.js";
 import { GameLoopService } from "./services/GameLoopService.js";
@@ -23,6 +24,8 @@ async function main(): Promise<void> {
   const world = gameFactory.createGameWorld();
   gameLoop.initialize(world);
   effectService.initialize();
+  const groundItemService = new GroundItemService(gameLoop, storage);
+  groundItemService.initialize();
   const validationService = new ValidationService(gameLoop, itemRegistry, staticDataService);
   const inventoryService = new InventoryService(gameLoop, storage, itemRegistry, gameFactory, staticDataService);
   const server = new GameServer(gameFactory, validationService, inventoryService, gameLoop);
