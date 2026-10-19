@@ -1,5 +1,6 @@
 import { Medkit } from "../items/medkit.js";
 import { Armor } from "../items/armor.js";
+import { Bandage } from "../items/bandage.js";
 import { Player } from "../core/player.js";
 import { WorldState } from "../core/world.js";
 import { ActiveEffect } from "../core/effect.js";
@@ -46,9 +47,16 @@ export class GameFactory {
     return item;
   }
 
+  createBandage(): IItem {
+    const item = new Bandage(this._staticDataService.config.ITEMS.bandage.healPerTick);
+    this._itemRegistry.register(item);
+    return item;
+  }
+
   createAllItems(): void {
     this.createMedkit();
     this.createArmor();
+    this.createBandage();
   }
 
   createEffect(type: string): IEffect {
