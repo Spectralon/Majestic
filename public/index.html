@@ -4,9 +4,43 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Majestic</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { display: flex; height: 100vh; background: #0f0f1a; color: #eee; font-family: sans-serif; }
+    canvas { border: 1px solid #333; }
+    .panel { padding: 16px; width: 260px; overflow-y: auto; }
+    .panel h3 { margin-bottom: 8px; font-size: 14px; }
+    .panel h4 { margin: 12px 0 4px; font-size: 13px; color: #aaa; }
+    button { display: block; width: 100%; margin: 3px 0; padding: 6px; background: #2a2a3e; color: #eee; border: 1px solid #444; cursor: pointer; font-size: 13px; }
+    button:hover { background: #3a3a5e; }
+    .inv { font-size: 12px; color: #8f8; margin-top: 4px; }
+    .status { font-size: 12px; color: #888; margin-top: 12px; }
+  </style>
 </head>
 <body>
-  <h1>Majestic</h1>
-  <p>Server running. WS on port 3001.</p>
+  <canvas id="world" width="800" height="600"></canvas>
+  <div class="panel">
+    <h3>Inventory</h3>
+    <div class="inv" id="inv">—</div>
+    <h4>Give</h4>
+    <button onclick="send({cmd:'give',type:'medkit'})">Medkit</button>
+    <button onclick="send({cmd:'give',type:'bandage'})">Bandage</button>
+    <button onclick="send({cmd:'give',type:'armor'})">Armor</button>
+    <button onclick="send({cmd:'give',type:'flare'})">Flare</button>
+    <h4>Use</h4>
+    <button onclick="send({cmd:'use',type:'medkit'})">Use Medkit</button>
+    <button onclick="send({cmd:'use',type:'bandage'})">Use Bandage</button>
+    <button onclick="send({cmd:'use',type:'armor'})">Use Armor</button>
+    <button onclick="send({cmd:'use',type:'flare'})">Use Flare</button>
+    <h4>Drop</h4>
+    <button onclick="send({cmd:'drop',type:'medkit'})">Drop Medkit</button>
+    <button onclick="send({cmd:'drop',type:'bandage'})">Drop Bandage</button>
+    <button onclick="send({cmd:'drop',type:'armor'})">Drop Armor</button>
+    <button onclick="send({cmd:'drop',type:'flare'})">Drop Flare</button>
+    <h4>Pickup</h4>
+    <p class="status">Click ground item on canvas</p>
+    <p class="status" id="status">connecting...</p>
+  </div>
+  <script src="app.js"></script>
 </body>
 </html>

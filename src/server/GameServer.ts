@@ -22,6 +22,8 @@ export class GameServer {
   private _httpServer: Server;
   private _wsServer: WebSocketServer;
   private _clients: Set<WebSocket> = new Set();
+  private _playerCounter: number = 0;
+  private _wsToPlayer: Map<WebSocket, string> = new Map();
 
   private readonly _httpPort: number;
   private readonly _wsPort: number;
@@ -41,8 +43,17 @@ export class GameServer {
     this._wsServer = new WebSocketServer({ port: this._wsPort });
     this._wsServer.on("connection", (ws) => {
       this._clients.add(ws);
+      this._playerCounter++;
+      const playerId = `p${this._playerCounter}`;
+      const player = this._gameFactory.createPlayer(playerId, { x: 400, y: 300 });
+      this._gameLoop.world.addPlayer(player);
+      this._wsToPlayer.set(ws, playerId);
+      ws.send(JSON.stringify({ playerId }));
       ws.on("message", (data) => this.handleMessage(ws, data.toString()));
-      ws.on("close", () => this._clients.delete(ws));
+      ws.on("close", () => {
+        this._clients.delete(ws);
+        this._wsToPlayer.delete(ws);
+      });
     });
   }
 
