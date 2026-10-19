@@ -1,4 +1,8 @@
 import { smoke } from "./scenarios/smoke.js";
+import { dropPickup } from "./scenarios/drop-pickup.js";
+import { groundTimeout } from "./scenarios/ground-timeout.js";
+import { useEffect } from "./scenarios/use-effect.js";
+import { concurrentPickup } from "./scenarios/concurrent-pickup.js";
 
 interface Scenario {
   name: string;
@@ -8,6 +12,10 @@ interface Scenario {
 async function main(): Promise<void> {
   const scenarios: Scenario[] = [
     smoke,
+    dropPickup,
+    groundTimeout,
+    useEffect,
+    concurrentPickup,
   ];
 
   let failed = 0;
