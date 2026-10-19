@@ -29,7 +29,7 @@ async function main(): Promise<void> {
   groundItemService.initialize();
   const validationService = new ValidationService(gameLoop, itemRegistry, staticDataService);
   const inventoryService = new InventoryService(gameLoop, storage, itemRegistry, gameFactory, staticDataService);
-  const server = new GameServer(gameFactory, validationService, inventoryService, gameLoop);
+  const server = new GameServer(gameFactory, validationService, inventoryService, gameLoop, staticDataService);
 
   await server.start();
   gameLoop.start();
