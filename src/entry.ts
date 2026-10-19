@@ -15,8 +15,9 @@ async function main(): Promise<void> {
   const staticDataService = new StaticDataService();
   const storage = new MemoryStorage(staticDataService.config.STORAGE_DELAY_MS);
   const itemRegistry = new ItemRegistryService();
-  const gameLoop = new GameLoopService(storage, (snapshot) =>
-    server.broadcast(snapshot),
+  const gameLoop = new GameLoopService(
+    staticDataService.config.TICK_INTERVAL_MS,
+    (snapshot) => server.broadcast(snapshot),
   );
   const effectService = new EffectService(gameLoop, itemRegistry);
   const gameFactory = new GameFactory(staticDataService, itemRegistry, gameLoop);

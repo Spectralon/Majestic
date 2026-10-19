@@ -1,13 +1,13 @@
 import type { WorldState } from "../core/world.js";
-import type { IStorage } from "../storage/IStorage.js";
 import type { ITickable, WorldSnapshot } from "../types.js";
 
 export class GameLoopService {
   private _world: WorldState | undefined = undefined;
   private _tickables: ITickable[] = [];
+  private _interval: NodeJS.Timeout | undefined = undefined;
 
   constructor(
-    private _storage: IStorage,
+    private _tickIntervalMs: number,
     private _broadcast: (snapshot: WorldSnapshot) => void,
   ) {}
 
@@ -27,9 +27,14 @@ export class GameLoopService {
   }
 
   start(): void {
+    this._interval = setInterval(() => this.tick(), this._tickIntervalMs);
   }
 
   stop(): void {
+    if (this._interval) {
+      clearInterval(this._interval);
+      this._interval = undefined;
+    }
   }
 
   tick(): void {
@@ -39,5 +44,9 @@ export class GameLoopService {
       }
     });
     this._tickables = this._tickables.filter((tickable) => tickable !== null);
+
+    this.world.advanceTick();
+
+    this._broadcast(this.world.getSnapshot());
   }
 }
