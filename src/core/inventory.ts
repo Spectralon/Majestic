@@ -44,4 +44,8 @@ export class Inventory {
       return Number.isNaN(num) ? max : Math.max(max, num);
     }, 0);
   }
+
+  hasItemOfType(type: string): boolean {
+    return this._items.some((i) => i.type === type);
+  }
 }

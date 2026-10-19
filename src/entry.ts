@@ -23,7 +23,7 @@ async function main(): Promise<void> {
   const world = gameFactory.createGameWorld();
   gameLoop.initialize(world);
   effectService.initialize();
-  const validationService = new ValidationService(gameLoop);
+  const validationService = new ValidationService(gameLoop, itemRegistry, staticDataService);
   const inventoryService = new InventoryService(gameLoop, storage, itemRegistry, gameFactory, staticDataService);
   const server = new GameServer(gameFactory, validationService, inventoryService, gameLoop);
 
