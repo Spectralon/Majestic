@@ -106,6 +106,14 @@ export class GameServer {
         this._gameLoop.world.addPlayer(player);
         break;
       }
+      case "spawnItem": {
+        const types = Object.keys(this._staticData.config.ITEMS);
+        const type = types[Math.floor(Math.random() * types.length)];
+        const x = Math.random() * this._staticData.config.WORLD_WIDTH;
+        const y = Math.random() * this._staticData.config.WORLD_HEIGHT;
+        await this._inventoryService.spawnItem(type, { x, y });
+        break;
+      }
       case "setTarget": {
         const result = this._validationService.validateMove(playerId, msg.x as number, msg.y as number);
         if (!result.ok) {

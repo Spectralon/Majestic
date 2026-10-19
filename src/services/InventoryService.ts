@@ -3,7 +3,7 @@ import type { GameLoopService } from "./GameLoopService.js";
 import type { ItemRegistryService } from "./ItemRegistryService.js";
 import type { GameFactory } from "./GameFactory.js";
 import type { StaticDataService } from "./StaticDataService.js";
-import type { ItemInstance } from "../types.js";
+import type { ItemInstance, Vec2 } from "../types.js";
 import { sqrDistance } from "../utils/distance.js";
 import {WorldState} from "../core/world";
 
@@ -57,6 +57,12 @@ export class InventoryService {
     const groundItem = this._gameFactory.createGroundItem(type, player.position);
     this._world.addGroundItem(groundItem);
     item.onDrop?.(player);
+    await this._storage.saveGroundItem(groundItem);
+  }
+
+  async spawnItem(type: string, position: Vec2): Promise<void> {
+    const groundItem = this._gameFactory.createGroundItem(type, position);
+    this._world.addGroundItem(groundItem);
     await this._storage.saveGroundItem(groundItem);
   }
 
