@@ -1,99 +1,112 @@
-# Majestic
+# Тестовое задание для Majestic RP
 
-Server-authoritative item system на Node.js + TypeScript: мир с тиковым циклом, игроки, предметы (medkit / armor / bandage / flare), инвентари, эффекты и ground items с таймаутом. Тонкий canvas-фронтенд наблюдает за миром через WS-снапшоты — вся логика на сервере.
+## Демо
 
-## Запуск
+Демо с полным прогоном логики по ТЗ на `localhost:3000/demo`. Сценарий:
 
-```bash
-npm install
-npm run build
-npm start
-```
+1. Спавним двух игроков.
+2. Спавним 3 вида дропа.
+3. Раздаём игрокам 2 цели, они к ним бегут. Третий дроп лежит на земле и со временем исчезает (600 тиков по конфигу).
+4. Когда прибежали - подбирают дроп.
+5. Используют то, что подобрали.
+6. Спавним дроп между ними на равном расстоянии.
+7. Игроки бегут к дропу, останавливаются рядом, пытаются подобрать. Удаётся только одному.
+8. Когда истечёт таймаут тиков - исчезают предметы на земле.
 
-- HTTP: `http://localhost:3000` — canvas-фронтенд (статика из `public/`)
-- WS: `ws://localhost:3001` — каждый тик сервер шлёт всем клиентам `WorldSnapshot`
-- Демо-сценарий: `http://localhost:3000/demo` — сервер сам запускает скриптованный сценарий (два игрока, подбор, flare-подсветка, use, конкурентный подбор); клиент только наблюдает. Прогон ≈ несколько секунд; повторное открытие `/demo` запускает новый прогон (игроки предыдущего прогона не удаляются)
+Демо можно запускать сколько угодно раз, но результаты предыдущих запусков не удаляются.
 
-## Тесты и верификация
+## Как устроен проект
 
-Каноничная цепочка — `verify.bat` (typecheck → build → tests):
+0. Статика на порте 3000 - минимальный фронтенд. Вся симуляция на сервере, клиент тонкий. Принимает стейт по WS на порте
+   3001 и отрисовывает. На сервер шлёт команды.
+1. Первый запуск:
 
-```bat
-verify.bat
-```
+   ```bash
+   npm install
+   npm run build
+   npm start
+   ```
 
-Или по шагам:
-
-```bash
-npm run typecheck   # tsc --noEmit
-npm run build       # tsc → dist/
-npm run test        # тестовые сценарии (tsx src/test/runner.ts)
-```
-
-Тесты — in-process сценарии (`src/test/runner.ts`): smoke, drop-pickup, ground-timeout, use-effect, concurrent-pickup. `npm run test` использует tsx, который не работает под песочницей (spawn EPERM) — поэтому каноничный путь проверки именно `verify.bat` (тесты из `dist/`, без дочерних процессов).
-
-## Предметы
-
-| Type    | onUse                              | onDrop                              |
-| ------- | ---------------------------------- | ----------------------------------- |
-| medkit  | `addHP(100)`                       | —                                   |
-| armor   | `addArmor(30)` (не стекуется)      | —                                   |
-| bandage | `addHP(5)` + эффект на 4 тика (+5/тик) | —                               |
-| flare   | — (использовать нельзя)            | `FlareService.applyHighlight` — подсветка игроков в радиусе 100 на 30 тиков |
+2. Общий принцип - берём контроль над любым игроком и управляем его действиями.
+3. Управление:
+    1) Кнопки: **Spawn Player**, **Spawn Item** - заспавнить игрока или случайный предмет на случайной позиции; *
+       *Give ...** - выдать выбранный предмет выбранному игроку; **Use ...** - использовать выбранный предмет на
+       выбранном игроке (если он у него есть); **Drop ...** - выбросить выбранный предмет из инвентаря выбранного
+       игрока (если он у него есть).
+    2) **ЛКМ по игроку** - выбрать игрока для управления; **ЛКМ по полю** - указать, куда идти выбранному игроку; **ЛКМ
+       по предмету на полу** - подобрать, если он рядом.
+    3) **ПКМ** - скрыть/показать инвентарь. Он сам показывается справа вверху, когда выбран игрок.
+4. Сценарий на `/demo` полностью server-driven, управляется `DemoService`.
 
 ## Архитектура
 
-Послойная, GRASP/SOLID; глобальных переменных нет — код в глобальном контексте только в `src/entry.ts` (композиция) и `src/test/runner.ts`.
+Общая идея - точка входа со строгим порядком создания и инициализации сервисов. Она же раздаёт им зависимости. DI без
+DI.
 
 ```
 src/
-  entry.ts                      — DI-композиция, точка входа
-  objects/                      — доменные объекты и типы данных
-    abstract.ts                 — ITickable, IEffect, IItemInstance
-    data.ts                     — Vec2, EffectData, PlayerData, WorldSnapshot (только типы)
-    World.ts                    — World: tick, players, ground items, snapshot
-    Player.ts                   — Player: position/target/hp/armor/effects/inventory, движение к target
-    Inventory.ts                — Inventory: стэкинг инстансов (stackable-флаг на IItemInstance)
-    ActiveEffect.ts             — ActiveEffect: remainingTicks, tick() → boolean
-    GroundItem.ts               — GroundItem (только тип)
-    items/                      — IItem.ts + Medkit / Armor / Bandage / Flare
-  infrastructure/
-    GameFactory.ts              — stateless-фабрика (world, players, items, ground items, effects)
-    GameServer.ts               — HTTP-статика (порт 3000) + WS (порт 3001)
-    services/
-      StaticDataService.ts      — единственный владелец config (readonly as const)
-      GameLoopService.ts        — ЕДИНСТВЕННЫЙ владелец World и ЕДИНСТВЕННЫЙ, кто тикает ITickable;
-                                  Observer: onSnapshot(listener)
-      ItemRegistryService.ts    — реестр предметов
-      ValidationService.ts      — validateMove/Pickup/Use/Drop (fail → {ok:false, reason})
-      DemoService.ts            — скриптованный демо-сценарий для /demo
-    storage/
-      IStorage.ts / MemoryStorage.ts — асинхронное хранилище (delay из config)
-  services/
-    EffectService.ts            — применяет onUse эффектов каждый тик
-    FlareService.ts             — подсветка игроков при drop flare
-    GroundItemService.ts        — удаление истёкших ground items
-    InventoryService.ts         — give/drop/pickup/use/spawn (основная логика в dropItemWithId/useItemWithId)
-  utils/
-    distance.ts / validation.ts
-  test/
-    runner.ts + scenarios/
-public/
-  index.html + app.js           — canvas-фронтенд
+├── entry.ts                        - DI-композиция, точка входа
+├── objects/                        - доменные объекты и типы данных
+│   ├── abstract.ts                 - интерфейсы
+│   ├── data.ts                     - потенциально сериализуемые маленькие модели
+│   ├── World.ts                    - игровой мир
+│   ├── Player.ts                   - игрок
+│   ├── Inventory.ts                - инвентарь
+│   ├── ActiveEffect.ts             - инстанс активного эффекта
+│   ├── GroundItem.ts               - предмет на полу
+│   └── items/                      - предметы инвентаря
+├── infrastructure/                 - слой инфраструктуры
+│   ├── GameFactory.ts              - фабрика игровых сущностей. Она же присваивает id (проблема п. 9) и раздаёт зависимости (нормального DI нет)
+│   ├── GameServer.ts               - сервер
+│   ├── services/                   - инфраструктурные сервисы
+│   │   ├── StaticDataService.ts    - провайдер статики (конфигов)
+│   │   ├── GameLoopService.ts      - основной игровой цикл: всех тикает и броадкастит игровой мир. Вообще тут смешение ответственности - TickService + GameLoopState. Но FSM для тестового явно будет слишком
+│   │   ├── ItemRegistryService.ts  - реестр-провайдер существующих типов предметов
+│   │   ├── ValidationService.ts    - валидация клиентского инпута
+│   │   └── DemoService.ts          - управляет демо по сценарию
+│   └── storage/
+│       ├── IStorage.ts             - контракт БД
+│       └── MemoryStorage.ts        - имитация БД
+├── services/                       - слой бизнес-логики (Application)
+│   ├── EffectService.ts            - запускает созданные эффекты
+│   ├── GroundItemService.ts        - отвечает за удаление предметов, которые слишком долго лежат
+│   ├── FlareService.ts             - отвечает за эффект Flare. Реализация по ТЗ мне не нравится - см. проблему п. 4. Приводит к кольцевой зависимости
+│   └── InventoryService.ts         - вся логика работы с инвентарями игроков
+├── utils/                          - утилитарный слой
+│   ├── distance.ts
+│   └── validation.ts
+└── test/                           - тесты
+    ├── runner.ts
+    └── scenarios/
+
+public/                             - фронтенд
+├── index.html
+└── app.js
 ```
 
-Ключевые решения:
+## Проблемы, которые в рамках тестового задания я оставил как есть
 
-- **Владелец мира — `GameLoopService`**: мир создаётся entry через фабрику и передаётся в `initialize(world)`; наружу — только readonly-геттер `world`. Сервисы мир в ctor не получают и не кэшируют — читают `gameLoop.world` в методах.
-- **Observer для снапшотов**: `GameLoopService` НЕ знает про сервер — `tick()` раздаёт snapshot всем подписчикам `onSnapshot(listener)`; `GameServer` подписывается в собственном конструкторе (`broadcast` приватный). Зависимый цикл `loop → server` и TDZ-замыкание на `server` исключены.
-- **`ITickable.tick(): boolean`**: `true` = остаться в цикле, `false` = отработал, `GameLoopService` выносит. Имплементы: `Player` (всегда `true`), `EffectService`, `GroundItemService`, `ActiveEffect` (самоудаляется при 0 тиков). `GameLoopService.tick()` — единственный, кто вызывает `tick()`.
-- **Цикл тика**: `_tickables.filter(t => t.tick())` → `world.advanceTick()` → snapshot → каждый listener. Тик — 100мс.
-- **Конструкторы — только ссылки (DI)**; создание объектов — в `initialize()`/методах фабрики. Из config-числа в ctor разрешена инициализация `readonly`-поля (GameLoopService, MemoryStorage).
-- **Владелец состояния валидирует свои поля**; предметы не клампят числа — только `player.addHP(...)` и т.п.
-- **Расширение предметом**: новый предмет = класс в `src/objects/items/` + `create<Type>()` в `GameFactory` + запись в `StaticDataService.config.ITEMS` + вызов в `createAllItems()`.
-
-## WS-протокол
-
-Клиент → сервер (JSON `{cmd, ...}`): `spawnPlayer`, `spawnItem`, `setTarget(playerId, x, y)`, `giveItem(playerId, itemType, amount?)`, `dropItem(playerId, itemId)`, `pickupItem(playerId, groundItemId)`, `useItem(playerId, itemId)`, `getInventory(playerId)`.
-
-Сервер → клиент: каждый тик `WorldSnapshot` (`{tick, players, groundItems, inventories}`) + `{error}` при ошибке валидации.
+0. Большинство сервисов передаются напрямую, без интерфейсов. Естественно, надо по контракту.
+1. Нет разделения на tick/lateTick (Update/LateUpdate). Поэтому, например, GroundItem-ы могут удалиться как до, так и
+   после срабатывания связанных эффектов (погрешность в пределах 1 тика). Как небольшой хак для временных эффектов -
+   tick возвращает boolean.
+2. Без SaveLoad сервиса - все кому надо что-то сохраняют по необходимости, бардак.
+3. В StaticDataService я объявляю config прям в инициализаторе, JSON конфига нет.
+4. По ТЗ я сделал onDrop прямо в IItem. С моей точки зрения правильнее было бы сделать событие onItemDrop в
+   InventoryService и подписаться на него из FlareService. Так не придётся прокидывать лишние зависимости в Flare.
+   Аналогично с onPickup, onUse - просто конкретно с Flare это сильнее всего выстрелило в ногу. Фабрика ведь тоже от
+   зависимостей распухает, нормального DI нет. Возникает кольцевая зависимость, приходится делать костыль с
+   flareService.initialize(gameFactory) в entry.
+5. В GroundItemService в tick не ожидается выполнение _storage.deleteGroundItem.
+6. В инвентаре removeItem всегда убирает 1 шт, без количества.
+7. Над оптимизацией я вообще не работал: broadcast мира каждый тик, для addItem в Inventory всегда создаётся новый
+   ItemInstance, даже если stackable и т. д.
+8. Не продуман ресет, не проработана инициализация. initialize есть, cleanup нигде не делал; IInitializable нет.
+9. Неконтролируемое присваивание id в фабрике, без сервиса. Поэтому фабрика не stateless и нарушает SRP.
+10. Огромный уродливый switch в GameServer в processCommand.
+11. Тесты и фронтенд я сгенерировал с помощью ИИ почти без правок - не было в ТЗ, просто для наглядности. Клиент
+    максимально примитивный, без интерполяции и прочего.
+12. Нет единого источника рандома.
+13. Не очень красивый switch в tryCreateEffect в GameFactory. И вообще подход с tryCreateEffect неправильный. Нужны свои
+    типы для каждого эффекта, реестр с соответствием по типу аналогично IItem-ам.
+14. Небольшой хаос в структуре проекта.
