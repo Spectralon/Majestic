@@ -6,6 +6,7 @@ import type { GameFactory } from "../services/GameFactory.js";
 import type { ValidationService } from "../services/ValidationService.js";
 import type { InventoryService } from "../services/InventoryService.js";
 import type { GameLoopService } from "../services/GameLoopService.js";
+import type { DemoService } from "../services/DemoService.js";
 import type { WorldSnapshot, ItemInstance } from "../types.js";
 import { StaticDataService } from "../services/StaticDataService.js";
 
@@ -33,6 +34,7 @@ export class GameServer {
       private _inventoryService: InventoryService,
       private _gameLoop: GameLoopService,
       private _staticData: StaticDataService,
+      private _demoService: DemoService,
   ) {
     this._httpPort = _staticData.config.HTTP_PORT;
     this._wsPort = _staticData.config.WS_PORT;
@@ -70,8 +72,9 @@ export class GameServer {
 
   private serveStatic(req: IncomingMessage, res: ServerResponse): void {
     const url = req.url ?? "/";
+    if (url === "/demo") this._demoService.start();
     let filePath = join(process.cwd(), "public", normalize(url));
-    if (url === "/" || url === "")
+    if (url === "/" || url === "" || url === "/demo")
       filePath = join(process.cwd(), "public", "index.html");
     readFile(filePath)
       .then((content) => {

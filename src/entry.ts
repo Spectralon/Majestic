@@ -8,6 +8,7 @@ import { FlareService } from "./services/FlareService.js";
 import { InventoryService } from "./services/InventoryService.js";
 import { ValidationService } from "./services/ValidationService.js";
 import { GameLoopService } from "./services/GameLoopService.js";
+import { DemoService } from "./services/DemoService.js";
 import { GameServer } from "./server/GameServer.js";
 
 async function main(): Promise<void> {
@@ -32,7 +33,8 @@ async function main(): Promise<void> {
   groundItemService.initialize();
   const validationService = new ValidationService(gameLoop, itemRegistry, staticDataService);
   const inventoryService = new InventoryService(gameLoop, storage, itemRegistry, gameFactory, staticDataService);
-  const server = new GameServer(gameFactory, validationService, inventoryService, gameLoop, staticDataService);
+  const demoService = new DemoService(gameLoop, gameFactory, inventoryService, staticDataService);
+  const server = new GameServer(gameFactory, validationService, inventoryService, gameLoop, staticDataService, demoService);
 
   await server.start();
   gameLoop.start();
