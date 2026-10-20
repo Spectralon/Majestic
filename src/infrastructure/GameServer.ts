@@ -2,13 +2,14 @@ import {createServer, type Server, type IncomingMessage, type ServerResponse} fr
 import {readFile} from "node:fs/promises";
 import {join, extname, normalize} from "node:path";
 import {WebSocketServer, WebSocket} from "ws";
-import type {GameFactory} from "../services/GameFactory.js";
-import type {ValidationService} from "../services/ValidationService.js";
-import type {InventoryService} from "../services/InventoryService.js";
-import type {GameLoopService} from "../services/GameLoopService.js";
-import type {DemoService} from "../services/DemoService.js";
-import type {WorldSnapshot, IItemInstance} from "../types.js";
-import {StaticDataService} from "../services/StaticDataService.js";
+import type {GameFactory} from "./GameFactory";
+import type {ValidationService} from "./services/ValidationService";
+import type {InventoryService} from "../services/InventoryService";
+import type {GameLoopService} from "./services/GameLoopService";
+import type {DemoService} from "./services/DemoService";
+import type {WorldSnapshot} from "../objects/data";
+import {StaticDataService} from "./services/StaticDataService";
+import { IItemInstance } from "../objects/abstract";
 
 const MIME_TYPES: Record<string, string> = {
     ".html": "text/html",

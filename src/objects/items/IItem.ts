@@ -1,4 +1,4 @@
-import type {Player} from "../core/Player";
+import type {Player} from "../Player";
 
 export interface IItem {
     readonly type: string;

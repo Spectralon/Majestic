@@ -1,5 +1,5 @@
-import type {IItem} from "./IItem.js";
-import type {Player} from "../core/Player";
+import type {IItem} from "./IItem";
+import type {Player} from "../Player";
 
 export class Armor implements IItem {
     readonly type = "armor";

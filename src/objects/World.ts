@@ -1,13 +1,14 @@
 import {Player} from "./Player";
-import type {GroundItem, IItemInstance, WorldSnapshot} from "../types.js";
-import {validatePosition} from "../utils/validation.js";
+import type {WorldSnapshot} from "./data";
+import {validatePosition} from "../utils/validation";
+import {GroundItem} from "./GroundItem";
 
-export class WorldState {
+export class World {
     private readonly _config: any;
 
     private _players: Map<string, Player> = new Map();
     private _groundItems: Map<string, GroundItem> = new Map();
-    
+
     private _tick: number = 0;
 
     constructor(config: any) {

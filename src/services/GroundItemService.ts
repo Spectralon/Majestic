@@ -1,6 +1,6 @@
-import type {ITickable} from "../types.js";
-import type {GameLoopService} from "./GameLoopService.js";
-import type {IStorage} from "../storage/IStorage.js";
+import type {ITickable} from "../objects/abstract";
+import type {GameLoopService} from "../infrastructure/services/GameLoopService";
+import type {IStorage} from "../infrastructure/storage/IStorage";
 
 export class GroundItemService implements ITickable {
     private _gameLoop: GameLoopService;

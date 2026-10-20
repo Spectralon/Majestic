@@ -1,8 +1,9 @@
-import type {WorldState} from "../core/WorldState";
-import type {ITickable, WorldSnapshot} from "../types.js";
+import type {World} from "../../objects/World";
+import type {WorldSnapshot} from "../../objects/data";
+import type {ITickable} from "../../objects/abstract";
 
 export class GameLoopService {
-    private _world: WorldState | undefined = undefined;
+    private _world: World | undefined = undefined;
 
     private _tickables: ITickable[] = [];
 
@@ -14,11 +15,11 @@ export class GameLoopService {
     ) {
     }
 
-    initialize(world: WorldState): void {
+    initialize(world: World): void {
         this._world = world;
     }
 
-    get world(): WorldState {
+    get world(): World {
         if (this._world === undefined)
             throw new Error("GameLoopService: call initialize() first");
         return this._world;

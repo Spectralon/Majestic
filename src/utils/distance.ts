@@ -1,4 +1,4 @@
-import type { Vec2 } from "../types.js";
+import type { Vec2 } from "../objects/data";
 
 export function sqrDistance(a: Vec2, b: Vec2): number {
   const dx = a.x - b.x;

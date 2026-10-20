@@ -1,4 +1,5 @@
-import type {IItemInstance, GroundItem} from "../types.js";
+import type {IItemInstance} from "../../objects/abstract";
+import { GroundItem } from "../../objects/GroundItem";
 
 export interface IStorage {
     saveInventory(playerId: string, items: IItemInstance[]): Promise<void>;

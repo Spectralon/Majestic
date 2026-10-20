@@ -1,8 +1,8 @@
-import type {Vec2} from "../types.js";
-import type {GameLoopService} from "./GameLoopService.js";
-import type {GameFactory} from "./GameFactory.js";
-import type {StaticDataService} from "./StaticDataService.js";
-import {sqrDistance} from "../utils/distance.js";
+import type {Vec2} from "../objects/data";
+import type {GameLoopService} from "../infrastructure/services/GameLoopService";
+import type {GameFactory} from "../infrastructure/GameFactory";
+import type {StaticDataService} from "../infrastructure/services/StaticDataService";
+import {sqrDistance} from "../utils/distance";
 
 export class FlareService {
     private _gameLoop: GameLoopService;

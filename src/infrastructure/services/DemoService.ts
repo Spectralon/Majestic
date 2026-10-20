@@ -1,11 +1,12 @@
-import type {GameLoopService} from "./GameLoopService.js";
-import type {GameFactory} from "./GameFactory.js";
-import type {InventoryService} from "./InventoryService.js";
-import type {StaticDataService} from "./StaticDataService.js";
-import {sqrDistance} from "../utils/distance.js";
-import {GroundItem, Vec2} from "../types.js";
-import {WorldState} from "../core/WorldState";
-import {Player} from "../core/Player";
+import type {GameLoopService} from "./GameLoopService";
+import type {GameFactory} from "../GameFactory";
+import type {InventoryService} from "../../services/InventoryService";
+import type {StaticDataService} from "./StaticDataService";
+import {sqrDistance} from "../../utils/distance";
+import {Vec2} from "../../objects/data";
+import {World} from "../../objects/World";
+import {Player} from "../../objects/Player";
+import { GroundItem } from "../../objects/GroundItem";
 
 export class DemoService {
     private readonly _p1Position: Vec2 = {x: 100, y: 300};
@@ -16,10 +17,9 @@ export class DemoService {
 
     private readonly _pickupRadiusSqr;
 
-    private _gameFactory: GameFactory;
-    private _inventoryService: InventoryService;
-
-    private _world: WorldState;
+    private readonly _gameLoop: GameLoopService;
+    private readonly _gameFactory: GameFactory;
+    private readonly _inventoryService: InventoryService;
 
     private _running: boolean = false;
     private _runCounter: number = 0;
@@ -30,7 +30,7 @@ export class DemoService {
         inventoryService: InventoryService,
         staticDataService: StaticDataService,
     ) {
-        this._world = gameLoop.world;
+        this._gameLoop = gameLoop;
         this._gameFactory = gameFactory;
         this._inventoryService = inventoryService;
         this._pickupRadiusSqr = staticDataService.config.PLAYER.pickupRadius ** 2;
@@ -76,17 +76,17 @@ export class DemoService {
     private createPlayers(): { p1: Player; p2: Player } {
         const p1 = this._gameFactory.createPlayer(`demo${(this._runCounter)}_p1`, this._p1Position);
         const p2 = this._gameFactory.createPlayer(`demo${(this._runCounter)}_p2`, this._p2Position);
-        this._world.addPlayer(p1);
-        this._world.addPlayer(p2);
+        this._gameLoop.world.addPlayer(p1);
+        this._gameLoop.world.addPlayer(p2);
         return {p1, p2};
     }
 
     private async createDrop(): Promise<{ bandageDrop: GroundItem; flareDrop: GroundItem }> {
-        const known = new Set(this._world.getGroundItems().map((item) => item.id));
+        const known = new Set(this._gameLoop.world.getGroundItems().map((item) => item.id));
         await this._inventoryService.spawnItem("flare", this._flareSpot);
         await this._inventoryService.spawnItem("bandage", this._bandageSpot);
         await this._inventoryService.spawnItem("medkit", this._medkitSpot);
-        const spawned = this._world.getGroundItems().filter((item) => !known.has(item.id));
+        const spawned = this._gameLoop.world.getGroundItems().filter((item) => !known.has(item.id));
         const flareDrop = spawned[0];
         const bandageDrop = spawned[1];
         const medkitDrop = spawned[2];
@@ -109,9 +109,9 @@ export class DemoService {
             x: (p1.position.x + p2.position.x) / 2,
             y: (p1.position.y + p2.position.y) / 2,
         };
-        const knownMid = new Set(this._world.getGroundItems().map((item) => item.id));
+        const knownMid = new Set(this._gameLoop.world.getGroundItems().map((item) => item.id));
         await this._inventoryService.spawnItem("medkit", mid);
-        const midDrop = this._world.getGroundItems().find((item) => !knownMid.has(item.id));
+        const midDrop = this._gameLoop.world.getGroundItems().find((item) => !knownMid.has(item.id));
         if (!midDrop)
             throw new Error("demo: midpoint drop not found");
         return midDrop;

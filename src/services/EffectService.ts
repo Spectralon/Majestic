@@ -1,6 +1,6 @@
-import type {ITickable} from "../types.js";
-import type {GameLoopService} from "./GameLoopService.js";
-import type {ItemRegistryService} from "./ItemRegistryService.js";
+import type {ITickable} from "../objects/abstract";
+import type {GameLoopService} from "../infrastructure/services/GameLoopService";
+import type {ItemRegistryService} from "../infrastructure/services/ItemRegistryService";
 
 export class EffectService implements ITickable {
     private _itemRegistry: ItemRegistryService;

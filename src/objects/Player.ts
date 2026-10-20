@@ -1,12 +1,13 @@
-import type {IEffect, ITickable, PlayerData, Vec2} from "../types.js";
-import {validatePosition, validateAmount, validateStat} from "../utils/validation.js";
+import type {PlayerData, Vec2} from "./data";
+import type {IEffect, ITickable} from "./abstract";
+import {validatePosition, validateAmount, validateStat} from "../utils/validation";
 import {Inventory} from "./Inventory";
 
 export class Player implements ITickable {
     readonly id: string;
 
     private readonly _config: any;
-    
+
     private _effects: IEffect[] = [];
     private readonly _inventory: Inventory = new Inventory();
 

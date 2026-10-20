@@ -1,4 +1,4 @@
-import type {IEffect} from "../types.js";
+import type {IEffect} from "./abstract";
 
 export class ActiveEffect implements IEffect {
     readonly type: string;

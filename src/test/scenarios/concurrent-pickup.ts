@@ -1,13 +1,13 @@
 import assert from "node:assert";
-import { StaticDataService } from "../../services/StaticDataService.js";
-import { ItemRegistryService } from "../../services/ItemRegistryService.js";
-import { GameFactory } from "../../services/GameFactory.js";
+import { StaticDataService } from "../../infrastructure/services/StaticDataService";
+import { ItemRegistryService } from "../../infrastructure/services/ItemRegistryService";
+import { GameFactory } from "../../infrastructure/GameFactory";
 import { FlareService } from "../../services/FlareService.js";
 import { EffectService } from "../../services/EffectService.js";
 import { GroundItemService } from "../../services/GroundItemService.js";
 import { InventoryService } from "../../services/InventoryService.js";
-import { GameLoopService } from "../../services/GameLoopService.js";
-import { MemoryStorage } from "../../storage/MemoryStorage.js";
+import { GameLoopService } from "../../infrastructure/services/GameLoopService";
+import { MemoryStorage } from "../../infrastructure/storage/MemoryStorage.js";
 
 export const concurrentPickup = {
   name: "concurrent-pickup",

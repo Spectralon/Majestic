@@ -1,16 +1,18 @@
-import {Medkit} from "../items/Medkit";
-import {Armor} from "../items/Armor";
-import {Bandage} from "../items/Bandage";
-import {Flare} from "../items/Flare";
-import {Player} from "../core/Player";
-import {WorldState} from "../core/WorldState";
-import {ActiveEffect} from "../core/ActiveEffect";
-import type {IEffect, Vec2, GroundItem, IItemInstance} from "../types.js";
-import type {IItem} from "../items/IItem.js";
-import type {GameLoopService} from "./GameLoopService.js";
-import type {StaticDataService} from "./StaticDataService.js";
-import type {ItemRegistryService} from "./ItemRegistryService.js";
-import type {FlareService} from "./FlareService.js";
+import {Medkit} from "../objects/items/Medkit";
+import {Armor} from "../objects/items/Armor";
+import {Bandage} from "../objects/items/Bandage";
+import {Flare} from "../objects/items/Flare";
+import {Player} from "../objects/Player";
+import {World} from "../objects/World";
+import {ActiveEffect} from "../objects/ActiveEffect";
+import type {Vec2} from "../objects/data";
+import type {IEffect, IItemInstance} from "../objects/abstract";
+import type {IItem} from "../objects/items/IItem";
+import type {GameLoopService} from "./services/GameLoopService";
+import type {StaticDataService} from "./services/StaticDataService";
+import type {ItemRegistryService} from "./services/ItemRegistryService";
+import type {FlareService} from "../services/FlareService";
+import { GroundItem } from "../objects/GroundItem";
 
 export class GameFactory {
     private _staticDataService: StaticDataService;
@@ -33,8 +35,8 @@ export class GameFactory {
         this._flareService = flareService;
     }
 
-    createGameWorld(): WorldState {
-        return new WorldState(this._staticDataService.config);
+    createGameWorld(): World {
+        return new World(this._staticDataService.config);
     }
 
     createPlayer(id: string, position: Vec2): Player {

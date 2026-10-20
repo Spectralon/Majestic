@@ -1,4 +1,4 @@
-import type {IItemInstance} from "../types.js";
+import type {IItemInstance} from "./abstract";
 
 export class Inventory {
     private _items: IItemInstance[] = [];

@@ -1,4 +1,4 @@
-import type {IItem} from "../items/IItem.js";
+import type {IItem} from "../../objects/items/IItem";
 
 export class ItemRegistryService {
     private _items = new Map<string, IItem>();

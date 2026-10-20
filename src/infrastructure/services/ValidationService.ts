@@ -1,7 +1,7 @@
-import type {GameLoopService} from "./GameLoopService.js";
-import type {ItemRegistryService} from "./ItemRegistryService.js";
-import type {StaticDataService} from "./StaticDataService.js";
-import {sqrDistance} from "../utils/distance.js";
+import type {GameLoopService} from "./GameLoopService";
+import type {ItemRegistryService} from "./ItemRegistryService";
+import type {StaticDataService} from "./StaticDataService";
+import {sqrDistance} from "../../utils/distance";
 
 export type ValidationResult = { ok: true } | { ok: false; reason: string };
 

@@ -1,6 +1,6 @@
-import type {IItem} from "./IItem.js";
-import type {Player} from "../core/Player";
-import type {FlareService} from "../services/FlareService.js";
+import type {IItem} from "./IItem";
+import type {Player} from "../Player";
+import type {FlareService} from "../../services/FlareService";
 
 export class Flare implements IItem {
     readonly type = "flare";

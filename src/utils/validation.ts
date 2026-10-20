@@ -1,4 +1,4 @@
-import type { Vec2 } from "../types.js";
+import type { Vec2 } from "../objects/data";
 
 export function validatePosition(position: Vec2, width: number, height: number, label: string): Vec2 {
   if (!Number.isFinite(position.x) || !Number.isFinite(position.y)) {
