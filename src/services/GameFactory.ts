@@ -5,7 +5,7 @@ import { Flare } from "../items/flare.js";
 import { Player } from "../core/player.js";
 import { WorldState } from "../core/world.js";
 import { ActiveEffect } from "../core/effect.js";
-import type { IEffect, Vec2, GroundItem, ItemInstance } from "../types.js";
+import type { IEffect, Vec2, GroundItem, IItemInstance } from "../types.js";
 import type { IItem } from "../items/IItem.js";
 import type { GameLoopService } from "./GameLoopService.js";
 import type { StaticDataService } from "./StaticDataService.js";
@@ -77,7 +77,7 @@ export class GameFactory {
     };
   }
 
-  createItemInstance(type: string, amount: number): ItemInstance {
+  createItemInstance(type: string, amount: number): IItemInstance {
     this._instanceCounter++;
     return { id: `inst_${this._instanceCounter}`, type, amount };
   }

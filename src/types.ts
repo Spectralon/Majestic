@@ -28,7 +28,7 @@ export interface PlayerData {
   readonly effects: EffectData[];
 }
 
-export interface ItemInstance {
+export interface IItemInstance {
   readonly id: string;
   readonly type: string;
   readonly amount: number;
@@ -45,5 +45,5 @@ export interface WorldSnapshot {
   readonly tick: number;
   readonly players: PlayerData[];
   readonly groundItems: GroundItem[];
-  readonly inventories: Record<string, ItemInstance[]>;
+  readonly inventories: Record<string, IItemInstance[]>;
 }

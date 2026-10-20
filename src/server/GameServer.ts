@@ -7,7 +7,7 @@ import type { ValidationService } from "../services/ValidationService.js";
 import type { InventoryService } from "../services/InventoryService.js";
 import type { GameLoopService } from "../services/GameLoopService.js";
 import type { DemoService } from "../services/DemoService.js";
-import type { WorldSnapshot, ItemInstance } from "../types.js";
+import type { WorldSnapshot, IItemInstance } from "../types.js";
 import { StaticDataService } from "../services/StaticDataService.js";
 
 const MIME_TYPES: Record<string, string> = {
@@ -158,7 +158,7 @@ export class GameServer {
         break;
       }
       case "getInventory": {
-        const inventory: ItemInstance[] = this._inventoryService.getInventory(playerId);
+        const inventory: IItemInstance[] = this._inventoryService.getInventory(playerId);
         ws.send(JSON.stringify({ inventory }));
         break;
       }

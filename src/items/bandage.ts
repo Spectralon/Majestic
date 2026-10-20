@@ -1,6 +1,5 @@
 import type { IItem } from "./IItem.js";
 import type { Player } from "../core/player.js";
-import type { WorldState } from "../core/world.js";
 
 export class Bandage implements IItem {
   readonly type = "bandage";

@@ -1,18 +1,18 @@
 import type { IStorage } from "./IStorage.js";
-import type { ItemInstance, GroundItem } from "../types.js";
+import type { IItemInstance, GroundItem } from "../types.js";
 
 export class MemoryStorage implements IStorage {
-  private _inventories = new Map<string, ItemInstance[]>();
+  private _inventories = new Map<string, IItemInstance[]>();
   private _groundItems = new Map<string, GroundItem>();
 
   constructor(private _delayMs: number) {}
 
-  async saveInventory(playerId: string, items: ItemInstance[]): Promise<void> {
+  async saveInventory(playerId: string, items: IItemInstance[]): Promise<void> {
     await this.delay();
     this._inventories.set(playerId, items);
   }
 
-  async loadInventory(playerId: string): Promise<ItemInstance[] | null> {
+  async loadInventory(playerId: string): Promise<IItemInstance[] | null> {
     await this.delay();
     return this._inventories.get(playerId) ?? null;
   }

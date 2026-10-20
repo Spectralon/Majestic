@@ -1,5 +1,5 @@
 import { Player } from "./player.js";
-import type { GroundItem, ItemInstance, WorldSnapshot } from "../types.js";
+import type { GroundItem, IItemInstance, WorldSnapshot } from "../types.js";
 import { validatePosition } from "../utils/validation.js";
 
 export class WorldState {

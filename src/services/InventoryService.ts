@@ -3,7 +3,7 @@ import type { GameLoopService } from "./GameLoopService.js";
 import type { ItemRegistryService } from "./ItemRegistryService.js";
 import type { GameFactory } from "./GameFactory.js";
 import type { StaticDataService } from "./StaticDataService.js";
-import type { ItemInstance, Vec2 } from "../types.js";
+import type { IItemInstance, Vec2 } from "../types.js";
 import { sqrDistance } from "../utils/distance.js";
 import {WorldState} from "../core/world";
 
@@ -30,7 +30,7 @@ export class InventoryService {
     this._pickupRadiusSqr = r * r;
   }
 
-  getInventory(playerId: string): ItemInstance[] {
+  getInventory(playerId: string): IItemInstance[] {
     const player = this._world.getPlayer(playerId);
     return [...player.inventory.items];
   }
