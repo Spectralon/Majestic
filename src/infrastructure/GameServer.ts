@@ -31,12 +31,12 @@ export class GameServer {
     private _playerCounter: number = 0;
 
     constructor(
-        private _gameFactory: GameFactory,
-        private _validationService: ValidationService,
-        private _inventoryService: InventoryService,
-        private _gameLoop: GameLoopService,
-        private _staticData: StaticDataService,
-        private _demoService: DemoService,
+        private readonly _gameFactory: GameFactory,
+        private readonly _validationService: ValidationService,
+        private readonly _inventoryService: InventoryService,
+        private readonly _gameLoop: GameLoopService,
+        private readonly _staticData: StaticDataService,
+        private readonly _demoService: DemoService,
     ) {
         this._httpPort = _staticData.config.HTTP_PORT;
         this._wsPort = _staticData.config.WS_PORT;

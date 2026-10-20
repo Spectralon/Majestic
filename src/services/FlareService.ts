@@ -5,7 +5,7 @@ import type {StaticDataService} from "../infrastructure/services/StaticDataServi
 import {sqrDistance} from "../utils/distance";
 
 export class FlareService {
-    private _gameLoop: GameLoopService;
+    private readonly _gameLoop: GameLoopService;
     private _gameFactory: GameFactory | undefined = undefined;
 
     private readonly _highlightRadiusSqr: number;

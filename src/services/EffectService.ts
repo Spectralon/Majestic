@@ -3,8 +3,8 @@ import type {GameLoopService} from "../infrastructure/services/GameLoopService";
 import type {ItemRegistryService} from "../infrastructure/services/ItemRegistryService";
 
 export class EffectService implements ITickable {
-    private _itemRegistry: ItemRegistryService;
-    private _gameLoop: GameLoopService;
+    private readonly _itemRegistry: ItemRegistryService;
+    private readonly _gameLoop: GameLoopService;
 
     constructor(gameLoop: GameLoopService, itemRegistry: ItemRegistryService) {
         this._gameLoop = gameLoop;

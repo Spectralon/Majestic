@@ -6,7 +6,7 @@ export class Flare implements IItem {
     readonly type = "flare";
     readonly stackable = true;
 
-    constructor(private _flareService: FlareService) {
+    constructor(private readonly _flareService: FlareService) {
     }
 
     onDrop(player: Player): void {

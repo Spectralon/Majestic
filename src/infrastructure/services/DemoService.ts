@@ -4,7 +4,6 @@ import type {InventoryService} from "../../services/InventoryService";
 import type {StaticDataService} from "./StaticDataService";
 import {sqrDistance} from "../../utils/distance";
 import {Vec2} from "../../objects/data";
-import {World} from "../../objects/World";
 import {Player} from "../../objects/Player";
 import { GroundItem } from "../../objects/GroundItem";
 

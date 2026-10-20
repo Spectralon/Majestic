@@ -6,9 +6,9 @@ import {sqrDistance} from "../../utils/distance";
 export type ValidationResult = { ok: true } | { ok: false; reason: string };
 
 export class ValidationService {
-    private _gameLoop: GameLoopService;
-    private _itemRegistry: ItemRegistryService;
-    private _staticDataService: StaticDataService;
+    private readonly _gameLoop: GameLoopService;
+    private readonly _itemRegistry: ItemRegistryService;
+    private readonly _staticDataService: StaticDataService;
 
     constructor(
         gameLoop: GameLoopService,

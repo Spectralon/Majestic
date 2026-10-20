@@ -15,10 +15,10 @@ import type {FlareService} from "../services/FlareService";
 import { GroundItem } from "../objects/GroundItem";
 
 export class GameFactory {
-    private _staticDataService: StaticDataService;
-    private _itemRegistry: ItemRegistryService;
-    private _gameLoop: GameLoopService;
-    private _flareService: FlareService;
+    private readonly _staticDataService: StaticDataService;
+    private readonly _itemRegistry: ItemRegistryService;
+    private readonly _gameLoop: GameLoopService;
+    private readonly _flareService: FlareService;
 
     private _groundItemCounter: number = 0;
     private _instanceCounter: number = 0;

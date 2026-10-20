@@ -6,7 +6,6 @@ import type {StaticDataService} from "../infrastructure/services/StaticDataServi
 import type {Vec2} from "../objects/data";
 import type {IItemInstance} from "../objects/abstract";
 import {sqrDistance} from "../utils/distance";
-import {World} from "../objects/World";
 
 export class InventoryService {
     private readonly _storage: IStorage;

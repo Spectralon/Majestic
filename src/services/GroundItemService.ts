@@ -3,8 +3,8 @@ import type {GameLoopService} from "../infrastructure/services/GameLoopService";
 import type {IStorage} from "../infrastructure/storage/IStorage";
 
 export class GroundItemService implements ITickable {
-    private _gameLoop: GameLoopService;
-    private _storage: IStorage;
+    private readonly _gameLoop: GameLoopService;
+    private readonly _storage: IStorage;
 
     constructor(gameLoop: GameLoopService, storage: IStorage) {
         this._gameLoop = gameLoop;

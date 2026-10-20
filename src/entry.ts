@@ -2,10 +2,10 @@ import { MemoryStorage } from "./infrastructure/storage/MemoryStorage.js";
 import { StaticDataService } from "./infrastructure/services/StaticDataService";
 import { ItemRegistryService } from "./infrastructure/services/ItemRegistryService";
 import { GameFactory } from "./infrastructure/GameFactory";
-import { EffectService } from "./services/EffectService.js";
-import { GroundItemService } from "./services/GroundItemService.js";
-import { FlareService } from "./services/FlareService.js";
-import { InventoryService } from "./services/InventoryService.js";
+import { EffectService } from "./services/EffectService";
+import { GroundItemService } from "./services/GroundItemService";
+import { FlareService } from "./services/FlareService";
+import { InventoryService } from "./services/InventoryService";
 import { ValidationService } from "./infrastructure/services/ValidationService";
 import { GameLoopService } from "./infrastructure/services/GameLoopService";
 import { DemoService } from "./infrastructure/services/DemoService";
@@ -13,8 +13,6 @@ import { GameServer } from "./infrastructure/GameServer";
 
 async function main(): Promise<void> {
   console.log("[entry] Server starting...");
-
-  // Композиция
 
   const staticDataService = new StaticDataService();
   const storage = new MemoryStorage(staticDataService.config.STORAGE_DELAY_MS);
@@ -33,15 +31,11 @@ async function main(): Promise<void> {
   const demoService = new DemoService(gameLoop, gameFactory, inventoryService, staticDataService);
   const server = new GameServer(gameFactory, validationService, inventoryService, gameLoop, staticDataService, demoService);
 
-  // Инициализация
-
   gameFactory.createAllItems();
   flareService.initialize(gameFactory);
   gameLoop.initialize(world);
   effectService.initialize();
   groundItemService.initialize();
-
-  // Запуск
 
   await server.start();
   gameLoop.start();
