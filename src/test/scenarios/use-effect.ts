@@ -14,8 +14,8 @@ export const useEffect = {
   async run(): Promise<void> {
     const staticDataService = new StaticDataService();
     const itemRegistry = new ItemRegistryService();
-    const storage = new MemoryStorage(0);
-    const gameLoop = new GameLoopService(staticDataService.config.TICK_INTERVAL_MS, () => {});
+    const storage = new MemoryStorage(staticDataService);
+    const gameLoop = new GameLoopService(staticDataService);
     const flareService = new FlareService(gameLoop, staticDataService);
     const factory = new GameFactory(staticDataService, itemRegistry, gameLoop, flareService);
     flareService.initialize(factory);

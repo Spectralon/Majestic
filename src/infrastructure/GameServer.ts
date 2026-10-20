@@ -9,7 +9,7 @@ import type {GameLoopService} from "./services/GameLoopService";
 import type {DemoService} from "./services/DemoService";
 import type {WorldSnapshot} from "../objects/data";
 import {StaticDataService} from "./services/StaticDataService";
-import { IItemInstance } from "../objects/abstract";
+import {IItemInstance} from "../objects/abstract";
 
 const MIME_TYPES: Record<string, string> = {
     ".html": "text/html",
@@ -44,6 +44,7 @@ export class GameServer {
             this.serveStatic(req, res);
         });
         this._wsServer = new WebSocketServer({port: this._wsPort});
+        this._gameLoop.onSnapshot((snapshot) => this.broadcast(snapshot));
     }
 
     async start(): Promise<void> {
@@ -65,7 +66,7 @@ export class GameServer {
         }
     }
 
-    broadcast(snapshot: WorldSnapshot): void {
+    private broadcast(snapshot: WorldSnapshot): void {
         const message = JSON.stringify(snapshot);
         for (const client of this._clients)
             if (client.readyState === WebSocket.OPEN)
@@ -74,7 +75,8 @@ export class GameServer {
 
     private serveStatic(req: IncomingMessage, res: ServerResponse): void {
         const url = req.url ?? "/";
-        if (url === "/demo") this._demoService.start();
+        if (url === "/demo")
+            this._demoService.start();
         let filePath = join(process.cwd(), "public", normalize(url));
         if (url === "/" || url === "" || url === "/demo")
             filePath = join(process.cwd(), "public", "index.html");

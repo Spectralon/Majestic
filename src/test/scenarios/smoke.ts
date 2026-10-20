@@ -12,8 +12,8 @@ export const smoke = {
   async run(): Promise<void> {
     const staticDataService = new StaticDataService();
     const itemRegistry = new ItemRegistryService();
-    const storage = new MemoryStorage(staticDataService.config.STORAGE_DELAY_MS);
-    const gameLoop = new GameLoopService(staticDataService.config.TICK_INTERVAL_MS, () => {});
+    const storage = new MemoryStorage(staticDataService);
+    const gameLoop = new GameLoopService(staticDataService);
     const effectService = new EffectService(gameLoop, itemRegistry);
     const flareService = new FlareService(gameLoop, staticDataService);
     const factory = new GameFactory(staticDataService, itemRegistry, gameLoop, flareService);

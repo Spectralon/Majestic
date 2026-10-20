@@ -1,12 +1,16 @@
 import type {IStorage} from "./IStorage";
 import type {IItemInstance} from "../../objects/abstract";
 import {GroundItem} from "../../objects/GroundItem";
+import type {StaticDataService} from "../services/StaticDataService";
 
 export class MemoryStorage implements IStorage {
     private _inventories = new Map<string, IItemInstance[]>();
     private _groundItems = new Map<string, GroundItem>();
 
-    constructor(private _delayMs: number) {
+    private readonly _delayMs: number;
+
+    constructor(staticDataService: StaticDataService) {
+        this._delayMs = staticDataService.config.STORAGE_DELAY_MS;
     }
 
     async saveInventory(playerId: string, items: IItemInstance[]): Promise<void> {
