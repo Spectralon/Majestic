@@ -29,20 +29,20 @@
       <div class="inv" id="inv">—</div>
     </div>
     <h4>Give</h4>
-    <button onclick="send({cmd:'give',type:'medkit'})">Medkit</button>
-    <button onclick="send({cmd:'give',type:'bandage'})">Bandage</button>
-    <button onclick="send({cmd:'give',type:'armor'})">Armor</button>
-    <button onclick="send({cmd:'give',type:'flare'})">Flare</button>
+    <button onclick="send({cmd:'giveItem',itemType:'medkit'})">Medkit</button>
+    <button onclick="send({cmd:'giveItem',itemType:'bandage'})">Bandage</button>
+    <button onclick="send({cmd:'giveItem',itemType:'armor'})">Armor</button>
+    <button onclick="send({cmd:'giveItem',itemType:'flare'})">Flare</button>
     <h4>Use</h4>
-    <button onclick="send({cmd:'use',type:'medkit'})">Use Medkit</button>
-    <button onclick="send({cmd:'use',type:'bandage'})">Use Bandage</button>
-    <button onclick="send({cmd:'use',type:'armor'})">Use Armor</button>
-    <button onclick="send({cmd:'use',type:'flare'})">Use Flare</button>
+    <button onclick="useItem('medkit')">Use Medkit</button>
+    <button onclick="useItem('bandage')">Use Bandage</button>
+    <button onclick="useItem('armor')">Use Armor</button>
+    <button onclick="useItem('flare')">Use Flare</button>
     <h4>Drop</h4>
-    <button onclick="send({cmd:'drop',type:'medkit'})">Drop Medkit</button>
-    <button onclick="send({cmd:'drop',type:'bandage'})">Drop Bandage</button>
-    <button onclick="send({cmd:'drop',type:'armor'})">Drop Armor</button>
-    <button onclick="send({cmd:'drop',type:'flare'})">Drop Flare</button>
+    <button onclick="dropItem('medkit')">Drop Medkit</button>
+    <button onclick="dropItem('bandage')">Drop Bandage</button>
+    <button onclick="dropItem('armor')">Drop Armor</button>
+    <button onclick="dropItem('flare')">Drop Flare</button>
     <p class="status">LMB player — control | LMB field — move | RMB — inventory</p>
     <p class="status" id="status">connecting...</p>
   </div>

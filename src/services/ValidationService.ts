@@ -40,24 +40,26 @@ export class ValidationService {
     return { ok: true };
   }
 
-  validateUse(playerId: string, type: string): ValidationResult {
+  validateUse(playerId: string, itemId: string): ValidationResult {
     const player = this._gameLoop.world.getPlayer(playerId);
-    const item = this._itemRegistry.get(type);
+    const instance = player.inventory.items.find((candidate) => candidate.id === itemId);
+    if (!instance) {
+      return { ok: false, reason: "item not in inventory" };
+    }
+    const item = this._itemRegistry.get(instance.type);
     if (!item.onUse) {
       return { ok: false, reason: "item cannot be used" };
-    }
-    if (!player.inventory.hasItemOfType(type)) {
-      return { ok: false, reason: "item not in inventory" };
     }
     return { ok: true };
   }
 
-  validateDrop(playerId: string, type: string): ValidationResult {
+  validateDrop(playerId: string, itemId: string): ValidationResult {
     const player = this._gameLoop.world.getPlayer(playerId);
-    this._itemRegistry.get(type);
-    if (!player.inventory.hasItemOfType(type)) {
+    const instance = player.inventory.items.find((candidate) => candidate.id === itemId);
+    if (!instance) {
       return { ok: false, reason: "item not in inventory" };
     }
+    this._itemRegistry.get(instance.type);
     return { ok: true };
   }
 }

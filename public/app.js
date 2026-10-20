@@ -38,6 +38,24 @@ function send(cmd) {
   ws.send(JSON.stringify(cmd));
 }
 
+function firstInstanceOfType(type) {
+  if (!controlledPlayerId || !snapshot) return null;
+  const items = snapshot.inventories[controlledPlayerId];
+  return (items && items.find((i) => i.type === type)) || null;
+}
+
+function dropItem(type) {
+  const instance = firstInstanceOfType(type);
+  if (!instance) return;
+  send({ cmd: "dropItem", itemId: instance.id });
+}
+
+function useItem(type) {
+  const instance = firstInstanceOfType(type);
+  if (!instance) return;
+  send({ cmd: "useItem", itemId: instance.id });
+}
+
 function render() {
   if (!snapshot) return;
   ctx.fillStyle = "#1a1a2e";
@@ -117,7 +135,7 @@ canvas.addEventListener("click", (e) => {
     const dx = x - item.position.x;
     const dy = y - item.position.y;
     if (dx * dx + dy * dy <= 200) {
-      send({ cmd: "pickup", groundItemId: item.id });
+      send({ cmd: "pickupItem", groundItemId: item.id });
       return;
     }
   }

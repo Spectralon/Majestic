@@ -48,16 +48,8 @@ export class InventoryService {
   }
 
   async drop(playerId: string, type: string): Promise<void> {
-    const player = this._world.getPlayer(playerId);
-    const item = this._itemRegistry.get(type);
-
-    player.inventory.removeItem(item);
-    await this._storage.saveInventory(playerId, [...player.inventory.items]);
-
-    const groundItem = this._gameFactory.createGroundItem(type, player.position);
-    this._world.addGroundItem(groundItem);
-    item.onDrop?.(player);
-    await this._storage.saveGroundItem(groundItem);
+    const instance = this.findInstanceOfType(playerId, type);
+    await this.dropItemWithId(playerId, instance.id);
   }
 
   async spawnItem(type: string, position: Vec2): Promise<void> {
@@ -85,10 +77,30 @@ export class InventoryService {
   }
 
   async use(playerId: string, type: string): Promise<void> {
-    const player = this._world.getPlayer(playerId);
-    const item = this._itemRegistry.get(type);
+    const instance = this.findInstanceOfType(playerId, type);
+    await this.useItemWithId(playerId, instance.id);
+  }
 
-    const effect = this._gameFactory.createEffectOrNull(type);
+  async dropItemWithId(playerId: string, itemId: string): Promise<void> {
+    const player = this._world.getPlayer(playerId);
+    const instance = this.findInstance(playerId, itemId);
+    const item = this._itemRegistry.get(instance.type);
+
+    player.inventory.removeItem(item);
+    await this._storage.saveInventory(playerId, [...player.inventory.items]);
+
+    const groundItem = this._gameFactory.createGroundItem(instance.type, player.position);
+    this._world.addGroundItem(groundItem);
+    item.onDrop?.(player);
+    await this._storage.saveGroundItem(groundItem);
+  }
+
+  async useItemWithId(playerId: string, itemId: string): Promise<void> {
+    const player = this._world.getPlayer(playerId);
+    const instance = this.findInstance(playerId, itemId);
+    const item = this._itemRegistry.get(instance.type);
+
+    const effect = this._gameFactory.createEffectOrNull(instance.type);
     if (effect) {
       player.addEffect(effect);
     } else if (item.onUse) {
@@ -97,6 +109,24 @@ export class InventoryService {
 
     player.inventory.removeItem(item);
     await this._storage.saveInventory(playerId, [...player.inventory.items]);
+  }
+
+  private findInstance(playerId: string, itemId: string): IItemInstance {
+    const player = this._world.getPlayer(playerId);
+    const instance = player.inventory.items.find((candidate) => candidate.id === itemId);
+    if (!instance) {
+      throw new Error(`Item not found in inventory: ${itemId}`);
+    }
+    return instance;
+  }
+
+  private findInstanceOfType(playerId: string, type: string): IItemInstance {
+    const player = this._world.getPlayer(playerId);
+    const instance = player.inventory.items.find((candidate) => candidate.type === type);
+    if (!instance) {
+      throw new Error(`Item not found in inventory: ${type}`);
+    }
+    return instance;
   }
 
   async loadInventory(playerId: string): Promise<void> {

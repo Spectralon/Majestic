@@ -127,19 +127,19 @@ export class GameServer {
         player.setTarget({ x: msg.x as number, y: msg.y as number });
         break;
       }
-      case "give":
-        await this._inventoryService.give(playerId, msg.type as string, msg.amount as number | undefined);
+      case "giveItem":
+        await this._inventoryService.give(playerId, msg.itemType as string, msg.amount as number | undefined);
         break;
-      case "drop": {
-        const result = this._validationService.validateDrop(playerId, msg.type as string);
+      case "dropItem": {
+        const result = this._validationService.validateDrop(playerId, msg.itemId as string);
         if (!result.ok) {
           this.sendError(ws, result.reason);
           break;
         }
-        await this._inventoryService.drop(playerId, msg.type as string);
+        await this._inventoryService.dropItemWithId(playerId, msg.itemId as string);
         break;
       }
-      case "pickup": {
+      case "pickupItem": {
         const result = this._validationService.validatePickup(playerId, msg.groundItemId as string);
         if (!result.ok) {
           this.sendError(ws, result.reason);
@@ -148,13 +148,13 @@ export class GameServer {
         await this._inventoryService.pickup(playerId, msg.groundItemId as string);
         break;
       }
-      case "use": {
-        const result = this._validationService.validateUse(playerId, msg.type as string);
+      case "useItem": {
+        const result = this._validationService.validateUse(playerId, msg.itemId as string);
         if (!result.ok) {
           this.sendError(ws, result.reason);
           break;
         }
-        await this._inventoryService.use(playerId, msg.type as string);
+        await this._inventoryService.useItemWithId(playerId, msg.itemId as string);
         break;
       }
       case "getInventory": {
