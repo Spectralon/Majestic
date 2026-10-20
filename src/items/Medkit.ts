@@ -1,0 +1,14 @@
+import type {IItem} from "./IItem.js";
+import type {Player} from "../core/Player";
+
+export class Medkit implements IItem {
+    readonly type = "medkit";
+    readonly stackable = true;
+
+    constructor(private _addHP: number) {
+    }
+
+    onUse(player: Player): void {
+        player.addHP(this._addHP);
+    }
+}
