@@ -36,13 +36,12 @@ export class InventoryService {
 
     async give(playerId: string, type: string, amount: number = 1): Promise<void> {
         const player = this._world.getPlayer(playerId);
-        const item = this._itemRegistry.get(type);
 
         if (!Number.isInteger(amount) || amount < 1)
             throw new Error("give: amount must be a positive integer");
 
         const instance = this._gameFactory.createItemInstance(type, amount);
-        player.inventory.addItem(item, instance);
+        player.inventory.addItem(instance);
         await this._storage.saveInventory(playerId, [...player.inventory.items]);
     }
 
@@ -56,7 +55,7 @@ export class InventoryService {
         const instance = this.findInstance(playerId, itemId);
         const item = this._itemRegistry.get(instance.type);
 
-        player.inventory.removeItem(item);
+        player.inventory.removeItem(instance);
         await this._storage.saveInventory(playerId, [...player.inventory.items]);
 
         const groundItem = this._gameFactory.createGroundItem(instance.type, player.position);
@@ -78,13 +77,11 @@ export class InventoryService {
         if (sqrDistance(player.position, groundItem.position) > this._pickupRadiusSqr)
             throw new Error("pickup: ground item out of range");
 
-        const item = this._itemRegistry.get(groundItem.type);
-
         this._world.removeGroundItem(groundItemId);
         await this._storage.deleteGroundItem(groundItemId);
 
         const instance = this._gameFactory.createItemInstance(groundItem.type, 1);
-        player.inventory.addItem(item, instance);
+        player.inventory.addItem(instance);
         await this._storage.saveInventory(playerId, [...player.inventory.items]);
     }
 
@@ -104,7 +101,7 @@ export class InventoryService {
         else if (item.onUse)
             item.onUse(player);
 
-        player.inventory.removeItem(item);
+        player.inventory.removeItem(instance);
         await this._storage.saveInventory(playerId, [...player.inventory.items]);
     }
 

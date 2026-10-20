@@ -32,6 +32,7 @@ export interface IItemInstance {
   readonly id: string;
   readonly type: string;
   readonly amount: number;
+  readonly stackable: boolean;
 }
 
 export interface GroundItem {

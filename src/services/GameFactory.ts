@@ -52,7 +52,8 @@ export class GameFactory {
 
     createItemInstance(type: string, amount: number): IItemInstance {
         this._instanceCounter++;
-        return {id: `inst_${this._instanceCounter}`, type, amount};
+        const item = this._itemRegistry.get(type);
+        return {id: `inst_${this._instanceCounter}`, type, amount, stackable: item.stackable};
     }
 
     createGroundItem(type: string, position: Vec2): GroundItem {

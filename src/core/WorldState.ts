@@ -50,13 +50,15 @@ export class WorldState {
     }
 
     removeGroundItem(itemId: string): void {
-        if (!this._groundItems.has(itemId)) throw new Error(`Ground item not found: ${itemId}`);
+        if (!this._groundItems.has(itemId))
+            throw new Error(`Ground item not found: ${itemId}`);
         this._groundItems.delete(itemId);
     }
 
     getGroundItemById(id: string): GroundItem {
         const item = this.getGroundItems().find((g) => g.id === id);
-        if (!item) throw new Error(`Ground item not found: ${item}`);
+        if (!item)
+            throw new Error(`Ground item not found: ${item}`);
         return item;
     }
 

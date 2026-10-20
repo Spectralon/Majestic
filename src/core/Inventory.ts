@@ -1,4 +1,3 @@
-import type {IItem} from "../items/IItem.js";
 import type {IItemInstance} from "../types.js";
 
 export class Inventory {
@@ -8,9 +7,9 @@ export class Inventory {
         return this._items;
     }
 
-    addItem(item: IItem, instance: IItemInstance): void {
-        if (item.stackable) {
-            const idx = this._items.findIndex((i) => i.type === item.type);
+    addItem(instance: IItemInstance): void {
+        if (instance.stackable) {
+            const idx = this._items.findIndex((i) => i.type === instance.type);
             if (idx !== -1) {
                 const updated: IItemInstance = {...this._items[idx], amount: this._items[idx].amount + instance.amount};
                 this._items = [...this._items.slice(0, idx), updated, ...this._items.slice(idx + 1)];
@@ -20,17 +19,17 @@ export class Inventory {
         this._items = [...this._items, instance];
     }
 
-    removeItem(item: IItem): IItemInstance {
-        const idx = this._items.findIndex((i) => i.type === item.type);
+    removeItem(instance: IItemInstance): IItemInstance {
+        const idx = this._items.findIndex((i) => i.id === instance.id);
         if (idx === -1)
-            throw new Error(`Item not found in inventory: ${item.type}`);
+            throw new Error(`Item not found in inventory: ${instance.id}`);
         const existing = this._items[idx];
         if (existing.amount > 1) {
             const updated: IItemInstance = {...existing, amount: existing.amount - 1};
             this._items = [...this._items.slice(0, idx), updated, ...this._items.slice(idx + 1)];
             return updated;
         }
-        this._items = this._items.filter((i) => i.type !== item.type);
+        this._items = this._items.filter((i) => i.id !== instance.id);
         return existing;
     }
 
