@@ -59,7 +59,7 @@ export class World {
     getGroundItemById(id: string): GroundItem {
         const item = this.getGroundItems().find((g) => g.id === id);
         if (!item)
-            throw new Error(`Ground item not found: ${item}`);
+            throw new Error(`Ground item not found: ${id}`);
         return item;
     }
 
